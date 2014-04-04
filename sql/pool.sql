@@ -23,10 +23,6 @@ CREATE TABLE families (
 	UNIQUE(unit_no, family_name)
 );
 
-CREATE TABLE age_ranges (
-	age_range      VARCHAR(20) NOT NULL PRIMARY KEY
-);
-
 CREATE TABLE passholders (
 	-- passholder number is not printed on the pass
 	passholder_no  SERIAL NOT NULL PRIMARY KEY,
