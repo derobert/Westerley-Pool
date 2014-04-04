@@ -6,6 +6,9 @@
 -- Further, note that many of these queries aren't indexed... Its not
 -- expected that the app will be looking up things this way...
 
+-- Load some variables with many-KB binary strings
+\i photo-vars.sql
+
 INSERT INTO streets (street_name) VALUES
 	('Sample Street'),
 	('Example Lane');
@@ -28,17 +31,21 @@ INSERT INTO contacts (family_no, contact_name) VALUES
 	((SELECT family_no FROM families WHERE family_name = 'Smith'), 'Contact 2');
 
 INSERT INTO passholders (
-	family_no, holder_name, holder_dob, holder_can_swim, holder_suspended
+	family_no, holder_name, holder_dob, holder_can_swim, holder_suspended,
+	holder_photo
 ) VALUES
 	(
 		(SELECT family_no FROM families WHERE family_name = 'Smith'),
-		'John Smith', '1900-01-01', TRUE, FALSE
+		'John Smith', '1900-01-01', TRUE, FALSE,
+		DECODE(:'john_smith_jpeg', 'hex')
 	), (
 		(SELECT family_no FROM families WHERE family_name = 'Smith'),
-		'John Smith, Jr.', '2000-01-01', TRUE, FALSE
+		'John Smith, Jr.', '2000-01-01', TRUE, FALSE,
+		DECODE(:'john_smith_jr_jpeg', 'hex')
 	), (
 		(SELECT family_no FROM families WHERE family_name = 'Doe'),
-		'Joe Doe', '1900-01-01', TRUE, FALSE
+		'Joe Doe', '1900-01-01', TRUE, FALSE,
+		DECODE(:'joe_doe_jpeg', 'hex')
 	);
 
 INSERT INTO contact_phones (contact_no, phone_number, phone_label)
@@ -90,3 +97,5 @@ INSERT INTO passholder_phones (passholder_no, phone_label, phone_number) VALUES
 		(SELECT passholder_no FROM passholders WHERE holder_name='John Smith'),
 		'Home', '(701) 555-5555'
 	);
+
+\i photo-unvars.sql

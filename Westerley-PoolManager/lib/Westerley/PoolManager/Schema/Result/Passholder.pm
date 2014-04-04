@@ -72,6 +72,11 @@ __PACKAGE__->table("passholders");
   data_type: 'boolean'
   is_nullable: 0
 
+=head2 holder_photo
+
+  data_type: 'bytea'
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -92,6 +97,8 @@ __PACKAGE__->add_columns(
   { data_type => "boolean", is_nullable => 0 },
   "holder_suspended",
   { data_type => "boolean", is_nullable => 0 },
+  "holder_photo",
+  { data_type => "bytea", is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -188,8 +195,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1Cvzq+O6EzV9qbx1mpvACw
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 18:51:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JpazLdBNAwaG2cpC9NpUYw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
