@@ -25,11 +25,17 @@ Catalyst Controller.
 sub view :Local :Args(1) {
 	my ($self, $c, $passholder_no) = @_;
 
-	my $row = $c->model('Pool::Passholder')->find($passholder_no)
-		or die "Unknown passholder";
+	my $row = $c->model('Pool::Passholder')->find(
+		$passholder_no, { key => 'primary', columns => [ 'holder_photo' ] });
 
-	$c->res->content_type('image/jpeg');
-	$c->res->body($row->holder_photo);
+	if ($row) {
+		$c->res->content_type('image/jpeg');
+		$c->res->body($row->holder_photo);
+	} else {
+		$c->log->warn("Image for passholder_no = $passholder_no not found");
+		$c->res->body('Image not found.');
+		$c->res->status(404);
+	}
 }
 
 
