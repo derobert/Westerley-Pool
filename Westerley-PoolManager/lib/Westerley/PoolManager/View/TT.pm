@@ -14,7 +14,7 @@ __PACKAGE__->config({
 		WRAPPER            => 'site/wrapper',
 		ENCODING           => 'utf-8',
 		ERROR              => 'error.tt2',
-		TEMPLATE_EXTENSION => '.tt',
+		TEMPLATE_EXTENSION => '.tt2',
 		TIMER              => 0,
 		render_die         => 1,
 	});

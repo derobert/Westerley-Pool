@@ -20,6 +20,8 @@ use Catalyst qw/
     -Debug
     ConfigLoader
     Static::Simple
+
+    StackTrace
 /;
 
 extends 'Catalyst';
@@ -39,6 +41,8 @@ __PACKAGE__->config(
     name => 'Westerley::PoolManager',
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
+    abort_chain_on_error_fix => 1, # don't continue after error
+    use_hash_multivalue_in_request => 1, 
     enable_catalyst_header => 1, # Send X-Catalyst header
 );
 
