@@ -48,7 +48,7 @@ CREATE TABLE passes (
 	-- pass numbers are generated randomly, to avoid trickery
 	pass_num        INTEGER NOT NULL PRIMARY KEY,
 
-	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE SET NULL,
+	passholder_num  INTEGER NULL REFERENCES passholders ON DELETE SET NULL,
 	pass_issued    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	pass_valid     BOOLEAN NOT NULL DEFAULT TRUE
 );

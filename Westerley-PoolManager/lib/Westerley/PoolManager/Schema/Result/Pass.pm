@@ -47,7 +47,7 @@ __PACKAGE__->table("passes");
 
   data_type: 'integer'
   is_foreign_key: 1
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 pass_issued
 
@@ -68,7 +68,7 @@ __PACKAGE__->add_columns(
   "pass_num",
   { data_type => "integer", is_nullable => 0 },
   "passholder_num",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
   "pass_issued",
   {
     data_type     => "timestamp with time zone",
@@ -106,12 +106,17 @@ __PACKAGE__->belongs_to(
   "passholder",
   "Westerley::PoolManager::Schema::Result::Passholder",
   { passholder_num => "passholder_num" },
-  { is_deferrable => 0, on_delete => "SET NULL", on_update => "NO ACTION" },
+  {
+    is_deferrable => 0,
+    join_type     => "LEFT",
+    on_delete     => "SET NULL",
+    on_update     => "NO ACTION",
+  },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gO22jfStL1NQF3zppyMuDA
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:19:03
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6Sh8sXdnaeNzxLkn3TAyBg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
