@@ -1,1 +1,3 @@
-﻿foo
+﻿<ul>
+  <li><a href="[% c.uri_for('/guard') %]">Guard Interface</a></li>
+</ul>

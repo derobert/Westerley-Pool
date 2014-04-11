@@ -1,0 +1,7 @@
+﻿<form method="get" action="[% search_by_name %]">
+<label for="search-by-name">Member's name</label>: <input id="search-by-name" name="name">
+<input type="submit" value="Go">
+</form>
+
+<label for="search-by-pass-no">Pass number</label>: <input id="search-by-pass-no" name="pass_no">
+<button onclick="window.location.href='[%lookup_by_pass_no%]/'+document.getElementById('search-by-pass-no').value">Go</button>

@@ -1,0 +1,57 @@
+﻿[% IF pass %]
+  [% IF pass.passholder %]
+<table>
+
+<span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
+<tr>
+  <td class="label member-name-label">Name:</td>
+  <td class="value member-name-value">[% pass.passholder.holder_name | html %]</td>
+</tr>
+<tr>
+  <td class="label pass-number-label">Address:</td>
+  <td class="value pass-number-value">
+    [% pass.passholder.family.unit.house_number %]
+    [% pass.passholder.family.unit.street.street_name %]
+  </td>
+</tr>
+<tr>
+  <td class="label pass-number-label">Pass Number:</td>
+  <td class="value pass-number-value">[% pass.pass_num | html %]</td>
+</tr>
+<tr>
+  <td class="label pass-issued-label">Issued:</td>
+  <td class="value pass-issued-value">[% pass.pass_issued | html %]</td>
+</tr>
+<tr>
+  <td class="label member-swimmer-label">Swimmer:</td>
+  <td class="value member-swimmer-value">[% pass.passholder.holder_can_swim | html %]</td>
+</tr>
+<tr>
+  <td class="label member-swimmer-label">Age Group:</td>
+  <td class="value member-swimmer-value">TODO</td>
+</tr>
+<tr>
+  <td class="label status-label">Status:</td>
+  <td class="value status-value">
+    [% IF ! pass.pass_valid %]pass invalid[% END %]
+    [% IF pass.passholder.holder_suspended %]passholder suspended[% END %]
+    [% IF pass.passholder.family.unit.unit_suspended %]unit suspended[% END %]
+  </td>
+</tr>
+</table>
+  [% ELSE %]
+<h1>Not a member</h1>
+<p>Pass number <tt>[% pass_no | html %]</tt> is not associated with any
+member, but used to be. This usually occurs when someone moves out.</p>
+
+<p>You can try looking the person up by name.</p>
+[% PROCESS 'guard/inc_searchforms.tt2' %]
+  [% END %]
+[% ELSE %]
+<h1>Not found</h1>
+Pass number <tt>[% pass_no | html %]</tt> was not found in the database. Please
+confirm the number was entered or scanned correctly.
+
+<h2>Search Again</h2>
+[% PROCESS 'guard/inc_searchforms.tt2' %]
+[% END %]

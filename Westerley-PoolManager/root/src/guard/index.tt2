@@ -1,0 +1,3 @@
+﻿<h1>Guard Interface</h1>
+
+[% PROCESS 'guard/inc_searchforms.tt2' %]
