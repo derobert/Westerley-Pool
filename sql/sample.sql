@@ -13,14 +13,14 @@ INSERT INTO streets (street_name) VALUES
 	('Sample Street'),
 	('Example Lane');
 
-INSERT INTO street_aliases (street_alias, street_name) VALUES
-	('Sample St', 'Sample Street'),
-	('Example Ln', 'Example Lane');
+INSERT INTO street_aliases (street_alias, street_ref) VALUES
+	('Sample St', (SELECT street_ref FROM streets WHERE street_name='Sample Street')),
+	('Example Ln', (SELECT street_ref FROM streets WHERE street_name='Example Lane'));
 
-INSERT INTO units (unit_num, house_number, street_name) VALUES
-	(1, 100, 'Sample Street'),
-	(2, 101, 'Sample Street'),
-	(3, 100, 'Example Lane');
+INSERT INTO units (unit_num, house_number, street_ref) VALUES
+	(1, 100, (SELECT street_ref FROM streets WHERE street_name='Sample Street')),
+	(2, 101, (SELECT street_ref FROM streets WHERE street_name='Sample Street')),
+	(3, 100, (SELECT street_ref FROM streets WHERE street_name='Example Lane'));
 
 INSERT INTO families (unit_num, family_name) VALUES
 	(1, 'Smith'),

@@ -44,20 +44,19 @@ __PACKAGE__->table("street_aliases");
   is_nullable: 0
   size: 100
 
-=head2 street_name
+=head2 street_ref
 
-  data_type: 'varchar'
+  data_type: 'integer'
   is_foreign_key: 1
   is_nullable: 0
-  size: 100
 
 =cut
 
 __PACKAGE__->add_columns(
   "street_alias",
   { data_type => "varchar", is_nullable => 0, size => 100 },
-  "street_name",
-  { data_type => "varchar", is_foreign_key => 1, is_nullable => 0, size => 100 },
+  "street_ref",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -74,7 +73,7 @@ __PACKAGE__->set_primary_key("street_alias");
 
 =head1 RELATIONS
 
-=head2 street_name
+=head2 street
 
 Type: belongs_to
 
@@ -83,15 +82,15 @@ Related object: L<Westerley::PoolManager::Schema::Result::Street>
 =cut
 
 __PACKAGE__->belongs_to(
-  "street_name",
+  "street",
   "Westerley::PoolManager::Schema::Result::Street",
-  { street_name => "street_name" },
+  { street_ref => "street_ref" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:a+SiBic+W6Q8t4jBCfXLsQ
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 03:03:48
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FpMg4nufXrMoxruvuH0Knw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

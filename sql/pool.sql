@@ -1,19 +1,20 @@
 CREATE TABLE streets (
-	street_name   VARCHAR(100) NOT NULL PRIMARY KEY
+	street_ref    SERIAL NOT NULL PRIMARY KEY,
+	street_name   VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE street_aliases (
 	street_alias  VARCHAR(100) NOT NULL PRIMARY KEY,
-	street_name   VARCHAR(100) NOT NULL REFERENCES streets
+	street_ref    INTEGER NOT NULL REFERENCES streets
 );
 
 CREATE TABLE units (
 	unit_num       INTEGER NOT NULL PRIMARY KEY,
 	house_number   INTEGER NOT NULL,
-	street_name    VARCHAR(100) NOT NULL REFERENCES streets,
+	street_ref     INTEGER NULL REFERENCES streets,
 
 	unit_suspended BOOLEAN NOT NULL DEFAULT 'no',
-	UNIQUE(house_number, street_name)
+	UNIQUE(house_number, street_ref)
 );
 
 CREATE TABLE families (

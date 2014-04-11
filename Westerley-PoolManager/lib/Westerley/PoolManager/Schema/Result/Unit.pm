@@ -48,12 +48,11 @@ __PACKAGE__->table("units");
   data_type: 'integer'
   is_nullable: 0
 
-=head2 street_name
+=head2 street_ref
 
-  data_type: 'varchar'
+  data_type: 'integer'
   is_foreign_key: 1
-  is_nullable: 0
-  size: 100
+  is_nullable: 1
 
 =head2 unit_suspended
 
@@ -68,8 +67,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 0 },
   "house_number",
   { data_type => "integer", is_nullable => 0 },
-  "street_name",
-  { data_type => "varchar", is_foreign_key => 1, is_nullable => 0, size => 100 },
+  "street_ref",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
   "unit_suspended",
   { data_type => "boolean", default_value => \"false", is_nullable => 0 },
 );
@@ -88,21 +87,21 @@ __PACKAGE__->set_primary_key("unit_num");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<units_house_number_street_name_key>
+=head2 C<units_house_number_street_ref_key>
 
 =over 4
 
 =item * L</house_number>
 
-=item * L</street_name>
+=item * L</street_ref>
 
 =back
 
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  "units_house_number_street_name_key",
-  ["house_number", "street_name"],
+  "units_house_number_street_ref_key",
+  ["house_number", "street_ref"],
 );
 
 =head1 RELATIONS
@@ -122,7 +121,7 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 street_name
+=head2 street
 
 Type: belongs_to
 
@@ -131,15 +130,20 @@ Related object: L<Westerley::PoolManager::Schema::Result::Street>
 =cut
 
 __PACKAGE__->belongs_to(
-  "street_name",
+  "street",
   "Westerley::PoolManager::Schema::Result::Street",
-  { street_name => "street_name" },
-  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+  { street_ref => "street_ref" },
+  {
+    is_deferrable => 0,
+    join_type     => "LEFT",
+    on_delete     => "NO ACTION",
+    on_update     => "NO ACTION",
+  },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9Z0UX/0mZ/nOWdQ2bYGXFg
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 03:03:48
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:G2jmDnSisyHRKqXQV9BgDQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
