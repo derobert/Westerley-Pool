@@ -87,6 +87,8 @@ INSERT INTO passes (passholder_num, pass_num, pass_issued, pass_valid) VALUES
 	), (
 		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith, Jr.'),
 		1308019131, '2014-04-01 15:30:00-0400', FALSE
+	), (
+		NULL, 778420100, '1980-01-02 12:00:00-0500', FALSE
 	);
 	
 INSERT INTO passholder_phones (passholder_num, phone_label, phone_number) VALUES
