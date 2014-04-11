@@ -38,12 +38,12 @@ __PACKAGE__->table("units");
 
 =head1 ACCESSORS
 
-=head2 unit_no
+=head2 unit_num
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 street_no
+=head2 house_number
 
   data_type: 'integer'
   is_nullable: 0
@@ -64,9 +64,9 @@ __PACKAGE__->table("units");
 =cut
 
 __PACKAGE__->add_columns(
-  "unit_no",
+  "unit_num",
   { data_type => "integer", is_nullable => 0 },
-  "street_no",
+  "house_number",
   { data_type => "integer", is_nullable => 0 },
   "street_name",
   { data_type => "varchar", is_foreign_key => 1, is_nullable => 0, size => 100 },
@@ -78,21 +78,21 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</unit_no>
+=item * L</unit_num>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("unit_no");
+__PACKAGE__->set_primary_key("unit_num");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<units_street_no_street_name_key>
+=head2 C<units_house_number_street_name_key>
 
 =over 4
 
-=item * L</street_no>
+=item * L</house_number>
 
 =item * L</street_name>
 
@@ -101,8 +101,8 @@ __PACKAGE__->set_primary_key("unit_no");
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  "units_street_no_street_name_key",
-  ["street_no", "street_name"],
+  "units_house_number_street_name_key",
+  ["house_number", "street_name"],
 );
 
 =head1 RELATIONS
@@ -118,7 +118,7 @@ Related object: L<Westerley::PoolManager::Schema::Result::Family>
 __PACKAGE__->has_many(
   "families",
   "Westerley::PoolManager::Schema::Result::Family",
-  { "foreign.unit_no" => "self.unit_no" },
+  { "foreign.unit_num" => "self.unit_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -138,8 +138,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:agttZ/nusI+D22EG5q1/UA
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9Z0UX/0mZ/nOWdQ2bYGXFg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

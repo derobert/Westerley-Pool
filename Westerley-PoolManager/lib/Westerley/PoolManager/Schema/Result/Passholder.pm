@@ -38,14 +38,14 @@ __PACKAGE__->table("passholders");
 
 =head1 ACCESSORS
 
-=head2 passholder_no
+=head2 passholder_num
 
   data_type: 'integer'
   is_auto_increment: 1
   is_nullable: 0
-  sequence: 'passholders_passholder_no_seq'
+  sequence: 'passholders_passholder_num_seq'
 
-=head2 family_no
+=head2 family_num
 
   data_type: 'integer'
   is_foreign_key: 1
@@ -80,14 +80,14 @@ __PACKAGE__->table("passholders");
 =cut
 
 __PACKAGE__->add_columns(
-  "passholder_no",
+  "passholder_num",
   {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
-    sequence          => "passholders_passholder_no_seq",
+    sequence          => "passholders_passholder_num_seq",
   },
-  "family_no",
+  "family_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "holder_name",
   { data_type => "varchar", is_nullable => 0, size => 100 },
@@ -105,36 +105,36 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</passholder_no>
+=item * L</passholder_num>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("passholder_no");
+__PACKAGE__->set_primary_key("passholder_num");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<passholders_holder_name_family_no_key>
+=head2 C<passholders_holder_name_family_num_key>
 
 =over 4
 
 =item * L</holder_name>
 
-=item * L</family_no>
+=item * L</family_num>
 
 =back
 
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  "passholders_holder_name_family_no_key",
-  ["holder_name", "family_no"],
+  "passholders_holder_name_family_num_key",
+  ["holder_name", "family_num"],
 );
 
 =head1 RELATIONS
 
-=head2 family_no
+=head2 family
 
 Type: belongs_to
 
@@ -143,9 +143,9 @@ Related object: L<Westerley::PoolManager::Schema::Result::Family>
 =cut
 
 __PACKAGE__->belongs_to(
-  "family_no",
+  "family",
   "Westerley::PoolManager::Schema::Result::Family",
-  { family_no => "family_no" },
+  { family_num => "family_num" },
   { is_deferrable => 0, on_delete => "CASCADE", on_update => "NO ACTION" },
 );
 
@@ -160,7 +160,7 @@ Related object: L<Westerley::PoolManager::Schema::Result::Pass>
 __PACKAGE__->has_many(
   "passes",
   "Westerley::PoolManager::Schema::Result::Pass",
-  { "foreign.passholder_no" => "self.passholder_no" },
+  { "foreign.passholder_num" => "self.passholder_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -175,7 +175,7 @@ Related object: L<Westerley::PoolManager::Schema::Result::PassholderContact>
 __PACKAGE__->has_many(
   "passholder_contacts",
   "Westerley::PoolManager::Schema::Result::PassholderContact",
-  { "foreign.passholder_no" => "self.passholder_no" },
+  { "foreign.passholder_num" => "self.passholder_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -190,13 +190,13 @@ Related object: L<Westerley::PoolManager::Schema::Result::PassholderPhone>
 __PACKAGE__->has_many(
   "passholder_phones",
   "Westerley::PoolManager::Schema::Result::PassholderPhone",
-  { "foreign.passholder_no" => "self.passholder_no" },
+  { "foreign.passholder_num" => "self.passholder_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 18:51:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JpazLdBNAwaG2cpC9NpUYw
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5EL7HGENbfF8Yp5s7vMIJg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

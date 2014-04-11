@@ -38,14 +38,14 @@ __PACKAGE__->table("families");
 
 =head1 ACCESSORS
 
-=head2 family_no
+=head2 family_num
 
   data_type: 'integer'
   is_auto_increment: 1
   is_nullable: 0
-  sequence: 'families_family_no_seq'
+  sequence: 'families_family_num_seq'
 
-=head2 unit_no
+=head2 unit_num
 
   data_type: 'integer'
   is_foreign_key: 1
@@ -60,14 +60,14 @@ __PACKAGE__->table("families");
 =cut
 
 __PACKAGE__->add_columns(
-  "family_no",
+  "family_num",
   {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
-    sequence          => "families_family_no_seq",
+    sequence          => "families_family_num_seq",
   },
-  "unit_no",
+  "unit_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "family_name",
   { data_type => "varchar", is_nullable => 0, size => 30 },
@@ -77,21 +77,21 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</family_no>
+=item * L</family_num>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("family_no");
+__PACKAGE__->set_primary_key("family_num");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<families_unit_no_family_name_key>
+=head2 C<families_unit_num_family_name_key>
 
 =over 4
 
-=item * L</unit_no>
+=item * L</unit_num>
 
 =item * L</family_name>
 
@@ -100,8 +100,8 @@ __PACKAGE__->set_primary_key("family_no");
 =cut
 
 __PACKAGE__->add_unique_constraint(
-  "families_unit_no_family_name_key",
-  ["unit_no", "family_name"],
+  "families_unit_num_family_name_key",
+  ["unit_num", "family_name"],
 );
 
 =head1 RELATIONS
@@ -117,7 +117,7 @@ Related object: L<Westerley::PoolManager::Schema::Result::Contact>
 __PACKAGE__->has_many(
   "contacts",
   "Westerley::PoolManager::Schema::Result::Contact",
-  { "foreign.family_no" => "self.family_no" },
+  { "foreign.family_num" => "self.family_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -132,11 +132,11 @@ Related object: L<Westerley::PoolManager::Schema::Result::Passholder>
 __PACKAGE__->has_many(
   "passholders",
   "Westerley::PoolManager::Schema::Result::Passholder",
-  { "foreign.family_no" => "self.family_no" },
+  { "foreign.family_num" => "self.family_num" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 unit_no
+=head2 unit
 
 Type: belongs_to
 
@@ -145,15 +145,15 @@ Related object: L<Westerley::PoolManager::Schema::Result::Unit>
 =cut
 
 __PACKAGE__->belongs_to(
-  "unit_no",
+  "unit",
   "Westerley::PoolManager::Schema::Result::Unit",
-  { unit_no => "unit_no" },
+  { unit_num => "unit_num" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mx9El+IvXD7U0JZv8mtU8A
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ZUsgwK64ynwpMVBHmJ/nfg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

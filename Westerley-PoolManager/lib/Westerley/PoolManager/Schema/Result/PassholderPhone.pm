@@ -38,7 +38,7 @@ __PACKAGE__->table("passholder_phones");
 
 =head1 ACCESSORS
 
-=head2 passholder_no
+=head2 passholder_num
 
   data_type: 'integer'
   is_foreign_key: 1
@@ -59,7 +59,7 @@ __PACKAGE__->table("passholder_phones");
 =cut
 
 __PACKAGE__->add_columns(
-  "passholder_no",
+  "passholder_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "phone_label",
   { data_type => "varchar", is_nullable => 0, size => 20 },
@@ -69,7 +69,7 @@ __PACKAGE__->add_columns(
 
 =head1 RELATIONS
 
-=head2 passholder_no
+=head2 passholder
 
 Type: belongs_to
 
@@ -78,15 +78,15 @@ Related object: L<Westerley::PoolManager::Schema::Result::Passholder>
 =cut
 
 __PACKAGE__->belongs_to(
-  "passholder_no",
+  "passholder",
   "Westerley::PoolManager::Schema::Result::Passholder",
-  { passholder_no => "passholder_no" },
+  { passholder_num => "passholder_num" },
   { is_deferrable => 0, on_delete => "CASCADE", on_update => "NO ACTION" },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5hxUXoBp63GVneDzH22Piw
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5UHuFiJC5ltLwnkwptWY+A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

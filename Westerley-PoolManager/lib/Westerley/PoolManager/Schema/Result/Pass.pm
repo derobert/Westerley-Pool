@@ -38,12 +38,12 @@ __PACKAGE__->table("passes");
 
 =head1 ACCESSORS
 
-=head2 pass_no
+=head2 pass_num
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 passholder_no
+=head2 passholder_num
 
   data_type: 'integer'
   is_foreign_key: 1
@@ -65,9 +65,9 @@ __PACKAGE__->table("passes");
 =cut
 
 __PACKAGE__->add_columns(
-  "pass_no",
+  "pass_num",
   { data_type => "integer", is_nullable => 0 },
-  "passholder_no",
+  "passholder_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "pass_issued",
   {
@@ -84,17 +84,17 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</pass_no>
+=item * L</pass_num>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("pass_no");
+__PACKAGE__->set_primary_key("pass_num");
 
 =head1 RELATIONS
 
-=head2 passholder_no
+=head2 passholder
 
 Type: belongs_to
 
@@ -103,15 +103,15 @@ Related object: L<Westerley::PoolManager::Schema::Result::Passholder>
 =cut
 
 __PACKAGE__->belongs_to(
-  "passholder_no",
+  "passholder",
   "Westerley::PoolManager::Schema::Result::Passholder",
-  { passholder_no => "passholder_no" },
+  { passholder_num => "passholder_num" },
   { is_deferrable => 0, on_delete => "SET NULL", on_update => "NO ACTION" },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-04 02:41:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8mqqrN7YPPhkI8f8eX9bFQ
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gO22jfStL1NQF3zppyMuDA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

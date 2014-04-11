@@ -8,25 +8,25 @@ CREATE TABLE street_aliases (
 );
 
 CREATE TABLE units (
-	unit_no        INTEGER NOT NULL PRIMARY KEY,
-	street_no      INTEGER NOT NULL,
+	unit_num       INTEGER NOT NULL PRIMARY KEY,
+	house_number   INTEGER NOT NULL,
 	street_name    VARCHAR(100) NOT NULL REFERENCES streets,
 
 	unit_suspended BOOLEAN NOT NULL DEFAULT 'no',
-	UNIQUE(street_no, street_name)
+	UNIQUE(house_number, street_name)
 );
 
 CREATE TABLE families (
-	family_no      SERIAL NOT NULL PRIMARY KEY,
-	unit_no        INTEGER NOT NULL REFERENCES units,
+	family_num      SERIAL NOT NULL PRIMARY KEY,
+	unit_num        INTEGER NOT NULL REFERENCES units,
 	family_name    VARCHAR(30) NOT NULL,
-	UNIQUE(unit_no, family_name)
+	UNIQUE(unit_num, family_name)
 );
 
 CREATE TABLE passholders (
 	-- passholder number is not printed on the pass
-	passholder_no  SERIAL NOT NULL PRIMARY KEY,
-	family_no      INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
+	passholder_num  SERIAL NOT NULL PRIMARY KEY,
+	family_num      INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
 
 	holder_name      VARCHAR(100) NOT NULL,
 	holder_dob       DATE NOT NULL,
@@ -35,41 +35,41 @@ CREATE TABLE passholders (
 
 	holder_photo    BYTEA NOT NULL,
 
-	UNIQUE(holder_name, family_no)
+	UNIQUE(holder_name, family_num)
 );
 
 CREATE TABLE passholder_phones (
-	passholder_no  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
+	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
 	phone_label    VARCHAR(20) NOT NULL,
 	phone_number   VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE passes (
 	-- pass numbers are generated randomly, to avoid trickery
-	pass_no        INTEGER NOT NULL PRIMARY KEY,
+	pass_num        INTEGER NOT NULL PRIMARY KEY,
 
-	passholder_no  INTEGER NOT NULL REFERENCES passholders ON DELETE SET NULL,
+	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE SET NULL,
 	pass_issued    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	pass_valid     BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE contacts (
-	contact_no     SERIAL PRIMARY KEY,
-	family_no      INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
+	contact_num     SERIAL PRIMARY KEY,
+	family_num      INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
 	contact_name   VARCHAR(100) NOT NULL,
 	contact_notes  TEXT
 );
 
 CREATE TABLE contact_phones (
-	contact_no     INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
+	contact_num     INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
 	phone_number   VARCHAR(20) NOT NULL,
 	phone_label    VARCHAR(20) NOT NULL,
-	PRIMARY KEY (contact_no, phone_number)
+	PRIMARY KEY (contact_num, phone_number)
 );
 
 CREATE TABLE passholder_contacts (
-	passholder_no  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
-	contact_no     INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
+	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
+	contact_num     INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
 	contact_order  INTEGER NOT NULL,
-	PRIMARY KEY (passholder_no, contact_no)
+	PRIMARY KEY (passholder_num, contact_num)
 );
