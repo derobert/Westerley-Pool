@@ -9,6 +9,12 @@
 -- Load some variables with many-KB binary strings
 \i photo-vars.sql
 
+INSERT INTO age_groups(age_group_name, min_age, max_age) VALUES 
+	('Under 12', '0-0',  '12-0'),
+	('12–15',    '12-0', '16-0'),
+	('16–17',    '16-0', '18-0'),
+	('Adult',    '18-0', '9999-11');
+
 INSERT INTO streets (street_name) VALUES
 	('Sample Street'),
 	('Example Lane');

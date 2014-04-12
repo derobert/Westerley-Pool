@@ -1,3 +1,30 @@
+CREATE TABLE age_groups (
+	age_group_num  SERIAL NOT NULL PRIMARY KEY,
+	age_group_name VARCHAR(100) NOT NULL UNIQUE,
+	min_age        INTERVAL YEAR TO MONTH NOT NULL UNIQUE, -- ≥ (gte)
+	max_age        INTERVAL YEAR TO MONTH NOT NULL UNIQUE  -- < (lt)
+	-- NOTE: PostgreSQL supports intervals up to 178000000 years,
+	-- according to the docs. Use an arbitrarily large max_age for your
+	-- last range.
+	
+	-- WARNING: There is a requirement that all possible ages are in
+	-- one and only one range. This would seem to require a CHECK
+	-- constraint with a subquery, and unfortunately PostgreSQL does not
+	-- support that. You must enforce this when you put your data in.
+);
+
+CREATE OR REPLACE FUNCTION datediff_ym (IN d1 DATE, IN d2 DATE)
+  RETURNS INTERVAL YEAR TO MONTH
+  LANGUAGE SQL
+  IMMUTABLE
+  RETURNS NULL ON NULL INPUT
+  SECURITY INVOKER
+  AS $$
+	SELECT
+	  (EXTRACT(YEAR FROM d1)-EXTRACT(YEAR FROM d2))*(INTERVAL '1' YEAR) 
+	+ (EXTRACT(MONTH FROM d1)-EXTRACT(MONTH FROM d2))*(INTERVAL '1' MONTH)
+  $$;
+
 CREATE TABLE streets (
 	street_ref    SERIAL NOT NULL PRIMARY KEY,
 	street_name   VARCHAR(100) NOT NULL UNIQUE
