@@ -43,9 +43,13 @@
     [% IF ! pass.pass_valid %]pass invalid[% END %]
     [% IF pass.passholder.holder_suspended %]passholder suspended[% END %]
     [% IF pass.passholder.family.unit.unit_suspended %]unit suspended[% END %]
+    [% IF pass.allow_admission() %] OK [% END %]
   </td>
 </tr>
 </table>
+    [% IF ! pass.allow_admission %]
+<h1>Do not admit</h1>
+    [% END %]
   [% ELSE %]
 <h1>Not a member</h1>
 <p>Pass number <tt>[% pass_no | html %]</tt> is not associated with any
