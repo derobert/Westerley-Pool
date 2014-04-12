@@ -24,11 +24,18 @@
 </tr>
 <tr>
   <td class="label member-swimmer-label">Swimmer:</td>
-  <td class="value member-swimmer-value">[% pass.passholder.holder_can_swim | html %]</td>
+  <td class="value member-swimmer-value">
+    [% IF pass.passholder.holder_can_swim %]
+    Yes
+    [% ELSE %]
+    No
+    [% END %]</td>
 </tr>
 <tr>
   <td class="label member-swimmer-label">Age Group:</td>
-  <td class="value member-swimmer-value">TODO</td>
+  <td class="value member-swimmer-value">
+    [% pass.passholder.age_group.age_group_name | html %]
+  </td>
 </tr>
 <tr>
   <td class="label status-label">Status:</td>

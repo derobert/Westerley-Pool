@@ -38,11 +38,11 @@ sub pass :Local :Args(1) {
 	# FIXME: This winds up pulling the jpeg...
 	my $row = $c->model('Pool::Pass')->find($pass_no, {
 		prefetch => {
-			passholder => { family => { unit => 'street' } }
+			passholder => { family => { unit => 'street' } ,
+			                age_group => undef },
 		},
 	});
 	if ($row) {
-		# TODO: Age category
 		$row->passholder and
 			$c->stash->{photo_uri} = $c->uri_for('/jpeg/view', $row->passholder->passholder_num);
 	} else {
