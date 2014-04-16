@@ -32,9 +32,16 @@ INSERT INTO families (unit_num, family_name) VALUES
 	(1, 'Smith'),
 	(2, 'Doe');
 
-INSERT INTO contacts (family_num, contact_name) VALUES
-	((SELECT family_num FROM families WHERE family_name = 'Smith'), 'Contact 1'),
-	((SELECT family_num FROM families WHERE family_name = 'Smith'), 'Contact 2');
+INSERT INTO contacts (
+	family_num, contact_name, contact_order, contact_admin, contact_emergency
+) VALUES
+	(
+		(SELECT family_num FROM families WHERE family_name = 'Smith'), 
+		'Contact 1', 10, true, false
+	), (
+		(SELECT family_num FROM families WHERE family_name = 'Smith'), 
+		'Contact 2', 20, true, true
+	);
 
 INSERT INTO passholders (
 	family_num, holder_name, holder_dob, holder_can_swim, holder_suspended,
@@ -67,22 +74,6 @@ VALUES
 		'(202) 555-5555', 'Cell'
 	);
 
-INSERT INTO passholder_contacts (passholder_num, contact_num, contact_order)
-VALUEs
-	(
-		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith'),
-		(SELECT contact_num FROM contacts WHERE contact_name = 'Contact 1'),
-		10
-	), (
-		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith, Jr.'),
-		(SELECT contact_num FROM contacts WHERE contact_name = 'Contact 2'),
-		10
-	), (
-		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith, Jr.'),
-		(SELECT contact_num FROM contacts WHERE contact_name = 'Contact 1'),
-		20
-	);
-
 INSERT INTO passes (passholder_num, pass_num, pass_issued, pass_valid) VALUES
 	(
 		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith'),
@@ -97,13 +88,4 @@ INSERT INTO passes (passholder_num, pass_num, pass_issued, pass_valid) VALUES
 		NULL, 778420100, '1980-01-02 12:00:00-0500', FALSE
 	);
 	
-INSERT INTO passholder_phones (passholder_num, phone_label, phone_number) VALUES
-	(
-		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith'),
-		'Cell', '(301) 555-5555'
-	), (
-		(SELECT passholder_num FROM passholders WHERE holder_name='John Smith'),
-		'Home', '(701) 555-5555'
-	);
-
 \i photo-unvars.sql

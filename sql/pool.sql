@@ -66,12 +66,6 @@ CREATE TABLE passholders (
 	UNIQUE(holder_name, family_num)
 );
 
-CREATE TABLE passholder_phones (
-	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
-	phone_label    VARCHAR(20) NOT NULL,
-	phone_number   VARCHAR(20) NOT NULL
-);
-
 CREATE TABLE passes (
 	-- pass numbers are generated randomly, to avoid trickery
 	pass_num        INTEGER NOT NULL PRIMARY KEY,
@@ -82,10 +76,14 @@ CREATE TABLE passes (
 );
 
 CREATE TABLE contacts (
-	contact_num     SERIAL PRIMARY KEY,
-	family_num      INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
-	contact_name   VARCHAR(100) NOT NULL,
-	contact_notes  TEXT
+	contact_num       SERIAL PRIMARY KEY,
+	family_num        INTEGER NOT NULL REFERENCES families ON DELETE CASCADE,
+	contact_order     INTEGER NOT NULL,
+	contact_name      VARCHAR(100) NOT NULL,
+	contact_admin     BOOLEAN NOT NULL,
+	contact_emergency BOOLEAN NOT NULL,
+	contact_notes     TEXT,
+	UNIQUE(family_num, contact_order)
 );
 
 CREATE TABLE contact_phones (
@@ -93,11 +91,4 @@ CREATE TABLE contact_phones (
 	phone_number   VARCHAR(20) NOT NULL,
 	phone_label    VARCHAR(20) NOT NULL,
 	PRIMARY KEY (contact_num, phone_number)
-);
-
-CREATE TABLE passholder_contacts (
-	passholder_num  INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
-	contact_num     INTEGER NOT NULL REFERENCES contacts ON DELETE CASCADE,
-	contact_order  INTEGER NOT NULL,
-	PRIMARY KEY (passholder_num, contact_num)
 );

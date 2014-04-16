@@ -51,11 +51,26 @@ __PACKAGE__->table("contacts");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 contact_order
+
+  data_type: 'integer'
+  is_nullable: 0
+
 =head2 contact_name
 
   data_type: 'varchar'
   is_nullable: 0
   size: 100
+
+=head2 contact_admin
+
+  data_type: 'boolean'
+  is_nullable: 0
+
+=head2 contact_emergency
+
+  data_type: 'boolean'
+  is_nullable: 0
 
 =head2 contact_notes
 
@@ -74,8 +89,14 @@ __PACKAGE__->add_columns(
   },
   "family_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "contact_order",
+  { data_type => "integer", is_nullable => 0 },
   "contact_name",
   { data_type => "varchar", is_nullable => 0, size => 100 },
+  "contact_admin",
+  { data_type => "boolean", is_nullable => 0 },
+  "contact_emergency",
+  { data_type => "boolean", is_nullable => 0 },
   "contact_notes",
   { data_type => "text", is_nullable => 1 },
 );
@@ -91,6 +112,25 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("contact_num");
+
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<contacts_family_num_contact_order_key>
+
+=over 4
+
+=item * L</family_num>
+
+=item * L</contact_order>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint(
+  "contacts_family_num_contact_order_key",
+  ["family_num", "contact_order"],
+);
 
 =head1 RELATIONS
 
@@ -124,24 +164,9 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 0, on_delete => "CASCADE", on_update => "NO ACTION" },
 );
 
-=head2 passholder_contacts
 
-Type: has_many
-
-Related object: L<Westerley::PoolManager::Schema::Result::PassholderContact>
-
-=cut
-
-__PACKAGE__->has_many(
-  "passholder_contacts",
-  "Westerley::PoolManager::Schema::Result::PassholderContact",
-  { "foreign.contact_num" => "self.contact_num" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NSP/vk8VgkGefAsWyefXSA
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-16 00:13:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:77TdbXsTpuox6ejl0MPGmQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

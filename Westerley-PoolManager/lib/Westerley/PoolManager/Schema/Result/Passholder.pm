@@ -164,39 +164,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 passholder_contacts
 
-Type: has_many
-
-Related object: L<Westerley::PoolManager::Schema::Result::PassholderContact>
-
-=cut
-
-__PACKAGE__->has_many(
-  "passholder_contacts",
-  "Westerley::PoolManager::Schema::Result::PassholderContact",
-  { "foreign.passholder_num" => "self.passholder_num" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 passholder_phones
-
-Type: has_many
-
-Related object: L<Westerley::PoolManager::Schema::Result::PassholderPhone>
-
-=cut
-
-__PACKAGE__->has_many(
-  "passholder_phones",
-  "Westerley::PoolManager::Schema::Result::PassholderPhone",
-  { "foreign.passholder_num" => "self.passholder_num" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:04:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5EL7HGENbfF8Yp5s7vMIJg
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-16 00:13:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fzEXPMhbfKXwoyVjhiSzaQ
 
 __PACKAGE__->belongs_to(
 	age_group => 'Westerley::PoolManager::Schema::Result::AgeGroup',
