@@ -1,0 +1,29 @@
+﻿<h1>Manage Families</h1>
+[% IF notfound %]
+<strong>The search you tried wasn't found. Sorry.</strong>
+[% END %]
+<table>
+  <tr>
+    <th>By Unit Number</th>
+    <td>
+      <form method="post">
+        <input type="text" name="unit_num" size=3>
+        <input type="submit" name="by_num" value="Go">
+      </form>
+    </td>
+  </tr>
+  <tr>
+    <th>By Address</th>
+    <td>
+      <form method="post">
+        <input type="text" name="house_number" size=6>
+        <select name="street_ref">
+[% FOREACH s IN streets %]
+          <option value="[% s.street_ref | html %]">[% s.street_name | html%]</option>
+[% END %]
+        </select>
+        <input type="submit" name="by_address" value="Go">
+      </form>
+    </td>
+  </tr>
+</table>

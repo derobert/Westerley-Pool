@@ -1,4 +1,5 @@
 package Westerley::PoolManager::Controller::Admin;
+use utf8;
 use Moose;
 use namespace::autoclean;
 
@@ -24,10 +25,29 @@ Catalyst Controller.
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->body('Matched Westerley::PoolManager::Controller::Admin in Admin.');
+	if ($c->req->params->{by_num}) {
+		my $num = 0 + $c->req->params->{unit_num}; # force to number
+		$c->res->redirect( $c->uri_for_action('admin/show_unit', $num), 303);
+		$c->detach;
+	}
+
+	if ($c->req->params->{by_address}) {
+		my $unit = $c->model('Pool::Unit')->find({ house_number => $c->req->params->{house_number}, street_ref => $c->req->params->{street_ref}});
+		if ($unit) {
+			$c->res->redirect( $c->uri_for_action('admin/show_unit', $unit->unit_num), 303);
+			$c->detach;
+		} else {
+			$c->stash->{notfound} = 1
+		}
+	}
+
+	$c->stash->{streets} = [
+		$c->model('Pool::Street')->search(undef, {order_by => 'street_name'})
+			->all
+		];
 }
 
-
+sub show_unit :Path('/unit') Args(1) {}
 
 =encoding utf8
 

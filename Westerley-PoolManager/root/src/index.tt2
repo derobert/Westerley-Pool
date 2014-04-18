@@ -1,3 +1,4 @@
 ﻿<ul>
   <li><a href="[% c.uri_for('/guard') %]">Guard Interface</a></li>
+  <li><a href="[% c.uri_for('/admin') %]">Admin Interface</a></li>
 </ul>
