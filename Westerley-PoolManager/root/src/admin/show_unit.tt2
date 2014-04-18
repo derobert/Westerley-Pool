@@ -16,6 +16,9 @@
       </button>
     </li>
   </ul>
+  <button type="submit" name="op" value="edit" class="edit-family">
+    View/Edit Family Passholders
+  </button>
   <!-- TODO: JavaScript to confirm delete -->
   <button type="submit" name="op" value="delete" class="delete-family">
     Delete Selected Family

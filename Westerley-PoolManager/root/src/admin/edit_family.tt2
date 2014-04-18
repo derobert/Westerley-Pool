@@ -1,0 +1,12 @@
+﻿<h1>The [% family.family_name | html %] Family</h1>
+
+<h2>Contacts</h2>
+[% FOREACH c = contacts.all %]
+ Contact: [% c.contact_name %]<br>
+[% END %]
+</h2>
+
+[% FOREACH p = passholders.all %]
+ Passholder: [% p.holder_name %]<br>
+[% END %]
+

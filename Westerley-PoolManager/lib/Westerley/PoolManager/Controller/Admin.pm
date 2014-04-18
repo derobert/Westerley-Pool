@@ -58,11 +58,33 @@ sub show_unit :Path('/unit') Args(1) {
 		} elsif ('delete' eq $op) {
 			$c->model('Pool::Family')->find($c->req->params->{family_num})
 				->delete;
+		} elsif ('edit' eq $op) {
+			$c->res->redirect($c->uri_for_action('admin/edit_family', $c->req->params->{family_num}), 303);
+		} else {
+			die "Uknown op";
 		}
 	}
 
 	$c->stash->{families} = $c->model('Pool::Family')
 		->search({unit_num => $unit_num}, {order_by => 'family_name'});
+}
+
+sub edit_family : Path('/family') Args(1) {
+	my ($self, $c, $family_num ) = @_;
+
+	my $family = $c->model('Pool::Family')->find($family_num)
+		or die "Family not found";
+
+	$c->stash->{family} = $family;
+	$c->stash->{contacts} = $family->contacts->search(
+		undef,
+		{
+			order_by => [qw(me.contact_name contact_phones.phone_label)],
+			prefetch => 'contact_phones'
+		});
+	$c->stash->{passholders}
+		= $family->passholders->search(undef, {order_by => 'holder_name'});
+
 }
 
 =encoding utf8
