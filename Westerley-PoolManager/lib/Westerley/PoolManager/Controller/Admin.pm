@@ -47,7 +47,23 @@ sub index :Path :Args(0) {
 		];
 }
 
-sub show_unit :Path('/unit') Args(1) {}
+sub show_unit :Path('/unit') Args(1) {
+	my ( $self, $c, $unit_num ) = @_;
+
+	if (my $op = $c->req->params->{op}) {
+		if ('add' eq $op) {
+			$c->model('Pool::Family')->create({
+					unit_num    => $unit_num,
+					family_name => $c->req->params->{family_name}});
+		} elsif ('delete' eq $op) {
+			$c->model('Pool::Family')->find($c->req->params->{family_num})
+				->delete;
+		}
+	}
+
+	$c->stash->{families} = $c->model('Pool::Family')
+		->search({unit_num => $unit_num}, {order_by => 'family_name'});
+}
 
 =encoding utf8
 

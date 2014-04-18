@@ -1,0 +1,23 @@
+﻿<h1>Pick a Family</h1>
+<form method="post">
+  <ul class="family-list">
+[% FOREACH f = families.all %]
+    <li>
+      <input type="radio" name="family_num" value="[% f.family_num %]"
+       id="fnum-[% f.family_num %]">
+      <label for="fnum-[% f.family_num %]">[% f.family_name | html %]
+        family</label>
+    </li>
+[% END %]
+    <li>
+      <input type="text" name="family_name" size=15 maxlength=30> family
+      <button type="submit" name="op" value="add" class="add-family">
+        Add
+      </button>
+    </li>
+  </ul>
+  <!-- TODO: JavaScript to confirm delete -->
+  <button type="submit" name="op" value="delete" class="delete-family">
+    Delete Selected Family
+  </button>
+</form>
