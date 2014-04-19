@@ -1,0 +1,144 @@
+﻿<style>
+  .note {
+    font-size: 90%;
+    margin-top: .5ex;
+    display: block;
+  }
+
+  .field-contact-contact_order {
+    width: 4em;
+  }
+
+  .field-contact-contact_name {
+    width: 20em;
+  }
+  .field-contact-contact_notes {
+    width: 25em;
+    height: 10ex;
+  }
+
+  .field-phone-label {
+    width: 5em;
+    text-align: right;
+  }
+
+  .field-phone-number {
+    width: 12em;
+    text-align: left;
+  }
+
+  td, th {
+    padding-bottom: 1ex;
+  }
+  th {
+    text-align: right;
+    padding-right: .5em;
+  }
+
+  .inner {
+    border-collapse: collapse;
+  }
+
+  .inner .fields td, .inner .fields th {
+    padding-bottom: 0;
+  }
+
+  .inner .labels th {
+    text-align: center;
+    font-size: 90%;
+  }
+
+  .inner .labels td, .inner .labels th {
+    padding-bottom: 2ex;
+  }
+</style>
+
+[%
+  MACRO fval(fname) IF C.req.params.$fname.defined;
+     GET C.req.params.$fname;
+   ELSE;
+     GET contact.$fname;
+   END
+%]
+[%
+  MACRO pval(n,fld) BLOCK;
+   SET pfname = "phone_${n}_$fld";
+   IF C.req.params.$pfname.defined;
+     GET C.req.params.$pfname;
+   ELSE;
+     GET phones.$n.$fld;
+   END;
+ END
+%]
+[% MACRO text_field(name) BLOCK %]
+        <input type="text" name="[%name | html%]"
+         class="field-contact-[%name|html%]" value="[% fval(name) | html %]">
+[% END %]
+[% MACRO cb_field(name) BLOCK %]
+        <input type="checkbox" name="[%name | html%]" value="1"
+         class="field-contact-[%name|html%]" [% 'checked' IF fval(name) %]>
+[% END %]
+[% MACRO ta_field(name) BLOCK %]
+        <textarea name="[%name | html%]" class="field-contact-[%name|html%]">
+[%- fval(name) %]</textarea>
+[% END %]
+[% MACRO field_row(type, label, name, note) BLOCK %]
+    <tr>
+      <th><label for="contact-order">[% label | html %]:</label></th>
+      <td>
+         [% $type(name) %]
+  [%- IF note %]
+         <span class="note">[% note | html %]</span>
+  [%- END %]
+      </td>
+    </tr>
+[% END %]
+[% SET max_phone_idx = phones.size + extra_phones - 1 %]
+
+<form method="post">
+  <input type="hidden" name="extra_phones" value="[% extra_phones %]">
+  <table>
+    [% field_row('text_field', 'Order', 'contact_order',
+                 'Leave blank to put last.') %]
+    [% field_row('text_field', 'Name', 'contact_name') %]
+    [% field_row('cb_field', 'Administrative', 'contact_admin') %]
+    [% field_row('cb_field', 'Emergency', 'contact_emergency') %]
+    <tr>
+      <th>Phone Numbers:</th>
+      <td>
+        <table class="inner"> <!-- tables in tables! Go 1998! -->
+[% FOREACH i IN [ 0 .. max_phone_idx ] %]
+          <tr class="fields">
+            <td>
+              <input type="text" name="phone_[%i%]_phone_label"
+               class="field-phone-label"
+               value="[% pval(i, 'phone_label') | html %]">
+            </td>
+            <td>
+              <input type="text" name="phone_[%i%]_phone_number"
+               class="field-phone-number"
+               value="[% pval(i, 'phone_number') | html %]">
+            </td>
+          </tr>
+          <tr class="labels">
+            <th>Label</th>
+            <th>Number</th>
+          </tr>
+[% END %]
+          <tr class="fields">
+            <td colspan="2">
+              <button name="op" value="add">
+                Add Another Phone Number
+              </button>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    [% field_row('ta_field', 'Notes', 'contact_notes') %]
+    <tr>
+      <td></td>
+      <td><button name="op" value="save">Save</button></td>
+    </tr>
+  </table>
+</form>

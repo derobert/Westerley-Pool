@@ -1,33 +1,73 @@
 ﻿<h1>The [% family.family_name | html %] Family</h1>
 
+<style>
+  .contacts-list .even {
+    background: rgb(230,230,255);
+  }
+  .contacts-list .odd {
+    background: rgb(230,255,255);
+  }
+
+  .contacts-list  {
+    border-collapse: collapse;
+   }
+
+  .contact-notes {
+    font-size: 90%;
+    font-style: italic;
+  }
+  
+  .contact-phone-entry {
+    margin-right: 2em;
+  }
+
+  .contact-phone-entry .label {
+    font-weight: bold;
+  }
+
+  .contacts-list .order {
+    min-width: 3em;
+  }
+</style>
+
 <h2>Contacts</h2>
-<table>
+<form method="post">
+  <table class="contacts-list">
 [% FOREACH c = contacts.all %]
-  <tr>
-    <td>[% c.contact_order %]</td>
-    <td>[% c.contact_name | html %]</td>
-    <td>[% 'Admin' IF c.contact_admin %]</td>
-    <td>[% 'Emergency' IF c.contact_emergency %]</td>
-  </tr>
-  [% IF '' != c.contact_notes %]
-  <tr>
-    <td class="contact-notes" colspan="4">
-      [% c.contact_notes | html %]
-    </td>
-  </tr>
-  [% END %]
-  <tr>
-    <td class="contact-phones" colspan="4">
+    <tr class="[%loop.count MOD 2 ? 'odd' : 'even'%]">
+      <td class="order">[% c.contact_order %]</td>
+      <td class="name">[% c.contact_name | html %]</td>
+      <td>
+        [% c.contact_admin ? '☒' : '☐' %]&nbsp;Administrative</label>
+      </td>
+      <td>
+        [% c.contact_emergency ? '☒' : '☐' %]&nbsp;Emergency</label>
+      </td>
+      <td><button name="op" value="c:edit:[%c.contact_num%]">Edit</button></td>
+    </tr>
+    <tr class="[%loop.count MOD 2 ? 'odd' : 'even'%]">
+      <td></td>
+      <td class="contact-phones" colspan="4">
   [% FOREACH p = c.contact_phones %]
-      <span class="contact-phone-entry">
-        <span class="label">[% p.phone_label | html %]</span>
-        <span class="phone">[% p.phone_number | html %]</span>
-      </span>
+        <span class="contact-phone-entry">
+          <span class="label">[% p.phone_label | html %]</span>
+          <span class="phone">[% p.phone_number | html %]</span>
+        </span>
   [% END %]
-    </td>
-  </tr>
+      </td>
+    </tr>
+  [% IF '' != c.contact_notes %]
+    <tr class="[%loop.count MOD 2 ? 'odd' : 'even'%]">
+      <td></td>
+      <td class="contact-notes" colspan="4">
+        [% c.contact_notes | html %]
+      </td>
+    </tr>
+  [% END %]
 [% END %]
-</table>
+  </table>
+  <button name="op" value="c:add">Add Contact</button>
+</form>
 
 <style>
   .passholder-card .photo {

@@ -2,6 +2,7 @@ package Westerley::PoolManager::Controller::Admin;
 use utf8;
 use Moose;
 use namespace::autoclean;
+use List::Util qw(max);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -72,6 +73,17 @@ sub show_unit :Path('/unit') Args(1) {
 sub edit_family : Path('/family') Args(1) {
 	my ($self, $c, $family_num ) = @_;
 
+	if (my $op = $c->req->params->{op}) {
+		if ('c:add' eq $op) {
+			$c->res->redirect($c->uri_for_action('/admin/edit_contact', $family_num, 'new'), 303);
+		} elsif ($op =~ /^c:edit:(\d+)$/) {
+			$c->res->redirect($c->uri_for_action('/admin/edit_contact', $family_num, $1), 303);
+		} else {
+			die "Unknown op '$op'";
+		}
+		$c->detach
+	}
+
 	my $family = $c->model('Pool::Family')->find($family_num)
 		or die "Family not found";
 
@@ -86,6 +98,39 @@ sub edit_family : Path('/family') Args(1) {
 		= $family->passholders->search(undef, {order_by => 'holder_name'});
 
 }
+
+sub edit_contact : Path('/contact') Args(2) {
+	my ($self, $c, $family_num, $contact_num) = @_;
+
+	my $contact;
+	if ('new' eq $contact_num) {
+		$contact = $c->model('Pool::Contact')
+			->new_result({family_num => $family_num});
+	} else {
+		$contact = $c->model('Pool::Contact')->find($contact_num)
+			or die "No such contact";
+	}
+
+	$c->stash->{extra_phones} = 1;
+	$c->stash->{contact} = $contact;
+	$c->stash->{extra_phones} = max(0 + $c->req->params->{extra_phones}, 1);
+
+	# amazingly, this works fine with new.
+	$c->stash->{phones} = [
+		$contact->contact_phones->search(undef, {order_by => 'phone_label'})
+	];
+
+	if (defined(my $op = $c->req->params->{op})) {
+		if ('add' eq $op) {
+			++$c->stash->{extra_phones};
+		} elsif ('save' eq $op) {
+			die "TODO";
+		} else {
+			die "Unknown op '$op'";
+		}
+	}
+}
+
 
 =encoding utf8
 
