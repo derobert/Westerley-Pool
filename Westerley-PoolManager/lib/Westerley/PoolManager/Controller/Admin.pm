@@ -79,7 +79,7 @@ sub edit_family : Path('/family') Args(1) {
 	$c->stash->{contacts} = $family->contacts->search(
 		undef,
 		{
-			order_by => [qw(me.contact_name contact_phones.phone_label)],
+			order_by => [qw(me.contact_order contact_phones.phone_label)],
 			prefetch => 'contact_phones'
 		});
 	$c->stash->{passholders}

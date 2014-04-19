@@ -1,12 +1,56 @@
 ﻿<h1>The [% family.family_name | html %] Family</h1>
 
 <h2>Contacts</h2>
+<table>
 [% FOREACH c = contacts.all %]
- Contact: [% c.contact_name %]<br>
+  <tr>
+    <td>[% c.contact_order %]</td>
+    <td>[% c.contact_name | html %]</td>
+    <td>[% 'Admin' IF c.contact_admin %]</td>
+    <td>[% 'Emergency' IF c.contact_emergency %]</td>
+  </tr>
+  [% IF '' != c.contact_notes %]
+  <tr>
+    <td class="contact-notes" colspan="4">
+      [% c.contact_notes | html %]
+    </td>
+  </tr>
+  [% END %]
+  <tr>
+    <td class="contact-phones" colspan="4">
+  [% FOREACH p = c.contact_phones %]
+      <span class="contact-phone-entry">
+        <span class="label">[% p.phone_label | html %]</span>
+        <span class="phone">[% p.phone_number | html %]</span>
+      </span>
+  [% END %]
+    </td>
+  </tr>
 [% END %]
-</h2>
+</table>
 
+<style>
+  .passholder-card .photo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    oject-position: bottom;
+  }
+  .passholder-card .name {
+    display: block
+  }
+  .passholder-card {
+    display: inline-table;
+    margin: .5em;
+  }
+</style>
+
+<h2>Passholders</h2>
 [% FOREACH p = passholders.all %]
- Passholder: [% p.holder_name %]<br>
+<div class="passholder-card">
+  <img class="photo"
+   src="[% C.uri_for('/jpeg/view', p.passholder_num) | html %]">
+  <span class="name">[% p.holder_name | html %]</span>
+</div>
 [% END %]
 
