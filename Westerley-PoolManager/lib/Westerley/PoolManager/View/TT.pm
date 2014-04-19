@@ -5,7 +5,7 @@ use namespace::autoclean;
 extends 'Catalyst::View::TT';
 
 __PACKAGE__->config({
-		CATALYST_VAR => 'c',
+		CATALYST_VAR => 'C',
 		INCLUDE_PATH => [
 			Westerley::PoolManager->path_to('root', 'src'),
 			Westerley::PoolManager->path_to('root', 'lib')
