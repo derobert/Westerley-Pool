@@ -44,6 +44,7 @@ __PACKAGE__->config(
     abort_chain_on_error_fix => 1, # don't continue after error
     use_hash_multivalue_in_request => 1, 
     enable_catalyst_header => 1, # Send X-Catalyst header
+    encoding => 'UTF-8',
 );
 
 # Start the application
