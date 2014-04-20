@@ -1,0 +1,5 @@
+[%
+	site.layout = {
+		footer_height = '3ex'
+	};
+-%]

@@ -1,6 +1,28 @@
 
-html {
+/* basic stuff to get the footer where it belongs. Idea taken from
+ * http://www.cssstickyfooter.com/using-sticky-footer-code.html and
+ * http://www.lwis.net/journal/2008/02/08/pure-css-sticky-footer/
+*/
+html, body {
     height: 100%;
+}
+
+#wrapper {
+	min-height: 100%;
+}
+
+#content {
+	overflow: auto;
+	padding-bottom: [% site.layout.footer_height %];
+}
+
+#footer-wrapper {
+	clear: both;
+	position: relative;
+	margin-top: -[% site.layout.footer_height %];
+	height: [% site.layout.footer_height %];
+    width: 100%;
+    overflow: hidden;
 }
 
 body {
@@ -8,7 +30,6 @@ body {
     color: [% site.col.text %];
     margin: 0px;
     padding: 0px;
-    height: 100%;
 }
 
 #header {
@@ -20,15 +41,12 @@ body {
     background-color: [% site.col.head %];
     text-align: center;
     border-top: 1px solid [% site.col.line %];
-    position: absolute;
-    bottom: 0;
-    left: 0px;
-    width: 100%;
     padding: 4px;
 }
 
 #content {
-    padding: 10px;
+    padding-left: 1ex;
+    padding-right: 1ex;
 }
 
 h1.title {
