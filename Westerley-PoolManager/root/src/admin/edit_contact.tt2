@@ -80,7 +80,7 @@
 [% END %]
 [% MACRO ta_field(name) BLOCK %]
         <textarea name="[%name | html%]" class="field-contact-[%name|html%]">
-[%- fval(name) %]</textarea>
+[%- fval(name) | html %]</textarea>
 [% END %]
 [% MACRO field_row(type, label, name, note) BLOCK %]
     <tr>
