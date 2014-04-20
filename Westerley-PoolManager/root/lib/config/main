@@ -18,7 +18,6 @@
 
    # load up any other configuration items
    PROCESS config/col
-         + config/url
          + config/layout;
 
    # set defaults for variables, etc.
