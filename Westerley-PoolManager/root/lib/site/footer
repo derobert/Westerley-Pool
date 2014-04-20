@@ -1,3 +1,6 @@
 <!-- BEGIN site/footer -->
-<div id="copyright">&copy; [% site.copyright %]</div>
+<span class="copyright">&copy; [% site.copyright %]</span>
+<span class="license"><a href="[% C.uri_for('/license') |html%]">Free
+Software (GPLv3)</a></span>
+<span class="github"><a href="https://github.com/derobert/Westerley-Pool">GitHub</a></span>
 <!-- END site/footer -->

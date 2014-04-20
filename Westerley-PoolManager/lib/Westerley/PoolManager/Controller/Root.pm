@@ -32,6 +32,8 @@ sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 }
 
+sub license : Local { }    # template does all the work
+
 =head2 default
 
 Standard 404 error page
