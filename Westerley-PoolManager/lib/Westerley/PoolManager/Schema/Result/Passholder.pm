@@ -72,6 +72,12 @@ __PACKAGE__->table("passholders");
   data_type: 'boolean'
   is_nullable: 0
 
+=head2 holder_notes
+
+  data_type: 'text'
+  default_value: (empty string)
+  is_nullable: 0
+
 =head2 holder_photo
 
   data_type: 'bytea'
@@ -97,6 +103,8 @@ __PACKAGE__->add_columns(
   { data_type => "boolean", is_nullable => 0 },
   "holder_suspended",
   { data_type => "boolean", is_nullable => 0 },
+  "holder_notes",
+  { data_type => "text", default_value => "", is_nullable => 0 },
   "holder_photo",
   { data_type => "bytea", is_nullable => 0 },
 );
@@ -165,8 +173,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-16 00:13:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fzEXPMhbfKXwoyVjhiSzaQ
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-23 00:17:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q9/ui06aeYolsgW+Umziew
 
 __PACKAGE__->belongs_to(
 	age_group => 'Westerley::PoolManager::Schema::Result::AgeGroup',

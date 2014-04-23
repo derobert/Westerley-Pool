@@ -61,6 +61,7 @@ CREATE TABLE passholders (
 	holder_can_swim  BOOLEAN NOT NULL,
 	holder_suspended BOOLEAN NOT NULL,
 
+	holder_notes    TEXT NOT NULL DEFAULT '',
 	holder_photo    BYTEA NOT NULL,
 
 	UNIQUE(holder_name, family_num)
