@@ -17,6 +17,13 @@ requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
+
+# Earlier versions are pretty broken.
+requires 'DBIx::Class::Helper::ResultSet::AutoRemoveColumns' => '2.021001';
+requires 'DBIx::Class::Helper::ResultSet::RemoveColumns' => '2.021001';
+
+requires 'DBD::Pg';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
