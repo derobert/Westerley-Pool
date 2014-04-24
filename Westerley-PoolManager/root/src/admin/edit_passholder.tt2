@@ -1,0 +1,87 @@
+﻿<style>
+  th { text-align: right; padding-right: .5em }
+  .passholder-name { width: 20em }
+  .passholder-dob { width: 7em }
+  #can-swim-0 { margin-left: 1em; }
+  .format { font-size: 90%; }
+  .format:before { content: '(' }
+  .format:after { content: ')' }
+  .note { font-size:90%; font-style:italic; display:block; margin-top:0.5ex; }
+  .photo-section {
+    float: right;
+    margin-top: 1em;
+  }
+  .photo { 
+    width: 201px;
+    height: 268px;
+    display: block;
+    object-fit: contain;
+    oject-position: bottom;
+    background: rgb(250,250,250);
+    border: 1px solid rgb(230,230,230);
+    padding: 1ex;
+  }
+</style>
+[%
+  MACRO fval(fname) IF C.req.params.$fname.defined;
+     GET C.req.params.$fname;
+   ELSE;
+     GET passholder.$fname;
+   END
+%]
+<form method="post">
+
+<div class="photo-section">
+[%- IF passholder.passholder_num %]
+  <img class="photo" src="[% C.uri_for('/jpeg/view', passholder.passholder_num) | html %]">
+[%- ELSE %]
+  <span class="photo">Please take a photo.</span>
+[%- END %]
+  <button type="button" id="camera-button">Camera</button>
+</div>
+
+<table>
+  <tr>
+    <th>Full Name:</th>
+    <td>
+      <input type="text" class="passholder-name" maxlength="100"
+       name="holder_name" value="[% fval('holder_name') | html %]">
+    </td>
+  </tr>
+  <tr>
+    <th>Date of Birth:</th>
+    <td>
+      <input type="text" class="passholder-dob" maxlength="10"
+       name="holder_dob" value="[% fval('holder_dob') | html %]">
+      <span class="format">YYYY-MM-DD</span>
+      <span class="note">
+        Children only. For an adult, enter 1900-01-01.
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <th>Can Swim?</th>
+    <td>
+      <input type="radio" class="passholder-can-swim" id="can-swim-1"
+       name="holder_can_swim" value="1"
+       [% 'checked' IF 1 == fval('holder_can_swim') %]><label
+       for="can-swim-0">Yes</label>
+      <input type="radio" class="passholder-can-swim" id="can-swim-0"
+       name="holder_can_swim" value="0"
+       [% 'checked' IF 0 == fval('holder_can_swim') %]><label
+       for="can-swim-0">No</label>
+    </td>
+  </tr>
+</table>
+<button type="submit" name="op" value="save">Save</button>
+</form>
+
+<script>
+function camera_click() {
+    $('#camera-button').hide();
+}
+
+$(document).ready(function() {
+    $('#camera-button').click(camera_click);
+})
+</script>

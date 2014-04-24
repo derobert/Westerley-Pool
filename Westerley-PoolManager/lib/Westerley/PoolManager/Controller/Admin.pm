@@ -78,6 +78,10 @@ sub edit_family : Path('/family') Args(1) {
 			$c->res->redirect($c->uri_for_action('/admin/edit_contact', $family_num, 'new'), 303);
 		} elsif ($op =~ /^c:edit:(\d+)$/) {
 			$c->res->redirect($c->uri_for_action('/admin/edit_contact', $family_num, $1), 303);
+		} elsif ('p:add' eq $op) {
+			$c->res->redirect($c->uri_for_action('/admin/edit_passholder', $family_num, 'new'), 303);
+		} elsif ($op =~ /^p:edit:(\d+)$/) {
+			$c->res->redirect($c->uri_for_action('/admin/edit_passholder', $family_num, $1), 303);
 		} else {
 			die "Unknown op '$op'";
 		}
@@ -173,6 +177,21 @@ sub edit_contact : Path('/contact') Args(2) {
 			die "Unknown op '$op'";
 		}
 	}
+}
+
+sub edit_passholder : Path('/passholder') Args(2) {
+	my ($self, $c, $family_num, $passholder_num) = @_;
+
+	my $passholder;
+	if ('new' eq $passholder_num) {
+		$passholder = $c->model('Pool::Passholder')
+			->new_result({family_num => $family_num});
+	} else {
+		$passholder = $c->model('Pool::Passholder')->find($passholder_num)
+			or die "No such passholder";
+	}
+
+	$c->stash->{passholder} = $passholder;
 }
 
 

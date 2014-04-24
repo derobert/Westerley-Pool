@@ -80,17 +80,26 @@
     display: block
   }
   .passholder-card {
-    display: inline-table;
+    padding: 0.25em;
     margin: .5em;
+  }
+  .passholder-add {
+    margin: .5em;
+    display: block;
   }
 </style>
 
 <h2>Passholders</h2>
+<form method="post">
 [% FOREACH p = passholders.all %]
-<div class="passholder-card">
-  <img class="photo"
-   src="[% C.uri_for('/jpeg/view', p.passholder_num) | html %]">
-  <span class="name">[% p.holder_name | html %]</span>
-</div>
+  <button name="op" value="p:edit:[%p.passholder_num%]"
+   class="passholder-card">
+    <img class="photo"
+     src="[% C.uri_for('/jpeg/view', p.passholder_num) | html %]">
+    <span class="name">[% p.holder_name | html %]</span>
+  </button>
 [% END %]
-
+  <button name="op" class="passholder-add" value="p:add">
+    Add New Passholder
+  </button>
+</form>
