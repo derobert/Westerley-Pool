@@ -40,7 +40,7 @@ CREATE TABLE units (
 	house_number   INTEGER NOT NULL,
 	street_ref     INTEGER NULL REFERENCES streets,
 
-	unit_suspended BOOLEAN NOT NULL DEFAULT 'no',
+	unit_suspended BOOLEAN NOT NULL DEFAULT false,
 	UNIQUE(house_number, street_ref)
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE passholders (
 	holder_name      VARCHAR(100) NOT NULL,
 	holder_dob       DATE NOT NULL,
 	holder_can_swim  BOOLEAN NOT NULL,
-	holder_suspended BOOLEAN NOT NULL,
+	holder_suspended BOOLEAN NOT NULL DEFAULT false,
 
 	holder_notes    TEXT NOT NULL DEFAULT '',
 	holder_photo    BYTEA NOT NULL,
