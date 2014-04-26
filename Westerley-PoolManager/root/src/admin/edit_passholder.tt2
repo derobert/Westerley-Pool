@@ -21,6 +21,34 @@
     border: 1px solid rgb(230,230,230);
     padding: 1ex;
   }
+
+  #camera-ui {
+    background: rgb(128,128,128);
+    position: absolute;
+    top: 0;
+    left: 0; right: 0;
+    z-index: 1;
+    width: 500px;
+    margin: 0 auto;
+  }
+  #vf-holder {
+    width: 480px;
+    height: 650px;
+  }
+  #viewfinder {
+    position: relative;
+    top: 90px;
+    left: -70px;
+    width: 640px;
+    height: 480px;
+    transform:rotate(90deg);
+  }
+  #camera-ui button {
+    display: block;
+    width: 10em;
+    height: 3em;
+    margin: 10px auto;
+  }
 </style>
 [%
   MACRO fval(fname) IF C.req.params.$fname.defined;
@@ -33,12 +61,21 @@
 
 <div class="photo-section">
 [%- IF passholder.passholder_num %]
-  <img class="photo" src="[% C.uri_for('/jpeg/view', passholder.passholder_num) | html %]">
+  <img class="photo" id="mug" src="[% C.uri_for('/jpeg/view', passholder.passholder_num) | html %]">
 [%- ELSE %]
-  <span class="photo">Please take a photo.</span>
+  <img class="photo" id="mug" alt="Please take a photo">
 [%- END %]
   <button type="button" id="camera-button">Camera</button>
 </div>
+
+<div id="camera-ui" hidden>
+  <div id="vf-holder">
+    <video id="viewfinder" autoplay></video>
+  </div>
+<button type="button" id="shutter" disabled>Take Photo</button>
+</div>
+
+<canvas id="canvas" width="480" height="640" hidden></canvas>
 
 <table>
   <tr>
@@ -73,12 +110,61 @@
     </td>
   </tr>
 </table>
+<input type="hidden" id="jpeg-data" name="new-jpeg" value="">
 <button type="submit" name="op" value="save">Save</button>
 </form>
 
 <script>
+function camera_ui(visible) {
+    if (visible) {
+        $('#camera-ui').show();
+        $('#camera-button').hide();
+    } else {
+        $('#camera-ui').hide();
+        $('#camera-button').show();
+    }
+}
+
+function camera_take_picture() {
+    var canvas = $('#canvas')[0];
+    var video = $('#viewfinder')[0];
+    var photo = $('#mug')[0];
+    var c = canvas.getContext('2d');
+    c.setTransform(0, 1, -1, 0, 480, 0);
+    c.drawImage(video, 0, 0);
+    var data = canvas.toDataURL('image/jpeg');
+    photo.src = data;
+    $('#jpeg-data').val(data);
+    video.mozSrcObject.stop();
+    video.mozSrcObject = null;
+    camera_ui(false);
+}
+
+function start_capture(stream) {
+    $('#shutter').prop('disabled', false)
+                 .click(camera_take_picture);
+    var obj = $('#viewfinder').get(0);
+    obj.mozSrcObject = stream;
+}
+
+function camera_error(err) {
+    alert("Could not start camera: " + err.name + "\n\n" + err.message);
+    camera_ui(false);
+}
+
 function camera_click() {
-    $('#camera-button').hide();
+    camera_ui(true);
+    navigator.myGetUserMedia = navigator.getUserMedia ||
+                               navigator.mozGetUserMedia || 
+                               navigator.webkitGetUserMedia;
+    if (!navigator.myGetUserMedia) {
+        alert("Browser doesn't support cameras...");
+        return;
+    }
+
+    navigator.myGetUserMedia(
+        { video: true, audio: false}, start_capture, camera_error
+    );
 }
 
 $(document).ready(function() {
