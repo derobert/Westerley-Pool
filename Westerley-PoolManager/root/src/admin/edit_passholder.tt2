@@ -41,13 +41,17 @@
     left: -70px;
     width: 640px;
     height: 480px;
+    -webkit-transform:rotate(90deg);
     transform:rotate(90deg);
   }
   #camera-ui button {
-    display: block;
     width: 10em;
     height: 3em;
-    margin: 10px auto;
+    margin: 10px;
+  }
+  #shutter {
+    right: 0;
+    position: absolute;
   }
 </style>
 [%
@@ -72,7 +76,8 @@
   <div id="vf-holder">
     <video id="viewfinder" autoplay></video>
   </div>
-<button type="button" id="shutter" disabled>Take Photo</button>
+<button type="button" id="camera-cancel">Cancel</button>
+<button type="button" id="shutter">Take Photo</button>
 </div>
 
 <canvas id="canvas" width="480" height="640" hidden></canvas>
@@ -115,11 +120,18 @@
 </form>
 
 <script>
+var gMediaStream;
+
 function camera_ui(visible) {
     if (visible) {
+        $('#shutter').prop('disabled', true);
         $('#camera-ui').show();
         $('#camera-button').hide();
     } else {
+        if (gMediaStream) {
+            gMediaStream.stop();
+            gMediaStream = null;
+        } 
         $('#camera-ui').hide();
         $('#camera-button').show();
     }
@@ -132,19 +144,18 @@ function camera_take_picture() {
     var c = canvas.getContext('2d');
     c.setTransform(0, 1, -1, 0, 480, 0);
     c.drawImage(video, 0, 0);
-    var data = canvas.toDataURL('image/jpeg');
+    var data = canvas.toDataURL('image/jpeg', 0.90);
     photo.src = data;
     $('#jpeg-data').val(data);
-    video.mozSrcObject.stop();
-    video.mozSrcObject = null;
     camera_ui(false);
 }
 
 function start_capture(stream) {
-    $('#shutter').prop('disabled', false)
-                 .click(camera_take_picture);
+    $('#shutter').prop('disabled', false);
     var obj = $('#viewfinder').get(0);
+    gMediaStream = stream;
     obj.mozSrcObject = stream;
+    obj.src = URL.createObjectURL(stream);
 }
 
 function camera_error(err) {
@@ -169,5 +180,7 @@ function camera_click() {
 
 $(document).ready(function() {
     $('#camera-button').click(camera_click);
+    $('#shutter').click(camera_take_picture);
+    $('#camera-cancel').click(function() { camera_ui(false) } );
 })
 </script>
