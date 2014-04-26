@@ -7,6 +7,7 @@
   .format:before { content: '(' }
   .format:after { content: ')' }
   .note { font-size:90%; font-style:italic; display:block; margin-top:0.5ex; }
+  .passholder-notes { width: 25em; height: 14ex; }
   .photo-section {
     float: right;
     margin-top: 1em;
@@ -114,7 +115,16 @@
        for="can-swim-0">No</label>
     </td>
   </tr>
+  <tr>
+    <th>Notes:</th>
+    <td>
+      <textarea class="passholder-notes"
+       name="holder_notes">[% fval('holder_notes') | html %]</textarea>
+       <span class="note">Will be printed on pass.</span>
+    </td>
+  </tr>
 </table>
+<!--  new-jpeg is filled by JavaScript if the user takes a new picture -->
 <input type="hidden" id="jpeg-data" name="new-jpeg" value="">
 <button type="submit" name="op" value="save">Save</button>
 </form>
