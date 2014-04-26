@@ -176,6 +176,8 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-23 00:17:56
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q9/ui06aeYolsgW+Umziew
 
+__PACKAGE__->column_info('holder_notes')->{remove_column} = 0;
+
 __PACKAGE__->belongs_to(
 	age_group => 'Westerley::PoolManager::Schema::Result::AgeGroup',
 	sub {
