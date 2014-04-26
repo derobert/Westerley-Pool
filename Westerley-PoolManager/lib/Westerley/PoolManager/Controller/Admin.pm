@@ -3,6 +3,7 @@ use utf8;
 use Moose;
 use namespace::autoclean;
 use List::Util qw(max);
+use MIME::Base64 qw(decode_base64);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -189,6 +190,28 @@ sub edit_passholder : Path('/passholder') Args(2) {
 	} else {
 		$passholder = $c->model('Pool::Passholder')->find($passholder_num)
 			or die "No such passholder";
+	}
+
+	if (defined(my $op = $c->req->params->{op})) {
+		if ('save' eq $op) {
+			$passholder->holder_name($c->req->params->{holder_name});
+			$passholder->holder_dob($c->req->params->{holder_dob});
+			$passholder->holder_notes($c->req->params->{holder_notes});
+			$passholder->holder_can_swim(
+				$c->req->params->{holder_can_swim} ? 1 : 0
+			);
+
+			if ('' ne (my $jpeg = $c->req->params->{'new-jpeg'})) {
+				$jpeg =~ s!^data:image/jpeg;base64,!! or die "jpeg is not a jpeg";
+				$passholder->holder_photo(decode_base64($jpeg));
+			}
+			$passholder->update_or_insert();
+			$c->res->redirect($c->uri_for_action('admin/edit_family',
+					$passholder->family_num), 303);
+			$c->detach;
+		} else {
+			die "Uknown up";
+		}
 	}
 
 	$c->stash->{passholder} = $passholder;
