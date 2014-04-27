@@ -21,12 +21,13 @@ $cr->rectangle(0, 0, 3.5*72, 2*72);
 $cr->fill;
 
 $cr->set_source_rgb(0, 0, 0);
-$cr->translate(72, 0);
+$cr->move_to(72, 0);
 my $layout = Pango::Cairo::create_layout($cr);
+Pango::Cairo::Context::set_resolution($layout->get_context, 72);
 $layout->set_width(Pango->scale * (72*2.5 - 72*0.125));
 $layout->set_text(q{John "S" Very Insanely Extra Long Full Name});
 $layout->set_font_description(
-	Pango::FontDescription->from_string('DejaVu Serif Bold 10'));
+	Pango::FontDescription->from_string('DejaVu Serif Bold 13'));
 Pango::Cairo::show_layout($cr, $layout);
 
 $cr->show_page;
