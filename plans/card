@@ -4,30 +4,76 @@ use utf8;
 
 use Cairo;
 use Gtk2;
+use Data::Dump qw(pp);
+
+use constant {
+	BARCODE_QUIET => 0.15,
+	BARCODE_WIDTH => 0.75,
+};
 
 my $cairo_surface = Cairo::PdfSurface->create('card.pdf', 8.5*72, 11*72);
 my $cr = Cairo::Context->create($cairo_surface);
-$cr->translate(0.70 * 72, 0.75 * 72);
+$cr->scale(72, 72);
+$cr->translate(0.70, 0.75);
 
 my $pb = Gtk2::Gdk::Pixbuf->new_from_file('/tmp/anthony.jpeg');
 Gtk2::Gdk::Cairo::Context::set_source_pixbuf($cr, $pb, 0, 0);
 
-my $scale = $pb->get_height / (72*1.125);
+my $scale = $pb->get_height / 1.125;
 my $m = $cr->get_source->get_matrix;
 $m->scale($scale, $scale);
 $cr->get_source->set_matrix($m);
 
-$cr->rectangle(0, 0, 3.5*72, 2*72);
+$cr->rectangle(0, 0, 3.5, 2);
 $cr->fill;
 
+# bar code
+$cr->set_source_rgb(.8, .8, .8);
+$cr->rectangle(0, 1.25, BARCODE_QUIET, 0.50);
+$cr->rectangle(BARCODE_QUIET + BARCODE_WIDTH, 1.25, BARCODE_QUIET, 0.50);
+$cr->fill;
+
+$cr->set_source_rgb(0.95, 0.95, 0.95);
+$cr->rectangle(BARCODE_QUIET, 1.25, BARCODE_WIDTH, 0.50);
+$cr->fill;
+
+# 12+ region
+$cr->set_source_rgb(1, .55, .55);
+$cr->rectangle(0, 1.75, 3.5, .25);
+$cr->fill;
+
+# pango seems to not work with tiny resolutions... so let's give it
+# something around the actual device resolution.
+$cr->save;
+$cr->move_to(1, 0);
 $cr->set_source_rgb(0, 0, 0);
-$cr->move_to(72, 0);
+$cr->scale(1/600, 1/600);
 my $layout = Pango::Cairo::create_layout($cr);
-Pango::Cairo::Context::set_resolution($layout->get_context, 72);
-$layout->set_width(Pango->scale * (72*2.5 - 72*0.125));
-$layout->set_text(q{John "S" Very Insanely Extra Long Full Name});
+Pango::Cairo::Context::set_resolution($layout->get_context, 600);
+$layout->context_changed;
+$layout->set_ellipsize('middle');
+$layout->set_height(Pango->scale * 600 * 0.5);
+$layout->set_width(Pango->scale * 600 * (2.5 - 0.125));
+$layout->set_text(q{John “S” Very Insanely Extra Long Full Name});
 $layout->set_font_description(
 	Pango::FontDescription->from_string('DejaVu Serif Bold 13'));
 Pango::Cairo::show_layout($cr, $layout);
+$cr->restore;
+
+$cr->save;
+$cr->move_to(1, 0);
+$cr->set_source_rgb(0, 0, 0);
+$cr->scale(1/600, 1/600);
+my $layout = Pango::Cairo::create_layout($cr);
+Pango::Cairo::Context::set_resolution($layout->get_context, 600);
+$layout->context_changed;
+$layout->set_ellipsize('middle');
+$layout->set_height(Pango->scale * 600 * 0.5);
+$layout->set_width(Pango->scale * 600 * (2.5 - 0.125));
+$layout->set_text(q{12+});
+$layout->set_font_description(
+	Pango::FontDescription->from_string('DejaVu Serif Bold 14'));
+Pango::Cairo::show_layout($cr, $layout);
+$cr->restore;
 
 $cr->show_page;
