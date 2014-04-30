@@ -1,0 +1,49 @@
+﻿<style>
+  .photo { 
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    -moz-object-fit: contain;
+    oject-position: bottom;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .pass-entry {
+    display: inline-block;
+    margin: 1ex;
+    background: rgb(240, 240, 255);
+    border: 1px solid rgb(200, 200, 255);
+    padding: 0.5ex;
+  }
+  .print-button {
+    display: block;
+  }
+</style>
+<form method="post">
+[% FOREACH ph = passes_to_issue.all %]
+  <div class="pass-entry">
+    <img class="photo"
+     src="[%C.uri_for('/jpeg/view', ph.passholder_num)|html%]">
+    <span class="check">
+      <input type="checkbox" name="which" value="[%ph.passholder_num%]"
+       id="checkbox-[%ph.passholder_num%]" checked>
+    </span>
+    <span class="name">
+      <label for="checkbox-[%ph.passholder_num%]">[% ph.holder_name %]</label>
+    </span>
+  </div>
+[% END %]
+[% IF 'list' == op %]
+<button class="print-button" name="op" value="issue">
+  Issue &amp; Print Checked
+</button>
+[% ELSIF 'issue' == op || 'print' == op %]
+<button class="print-button" name="op" value="print">
+  Re-print Checked
+</button>
+[% ELSE %]
+Something went wrong. App is confused.<br>
+Error: <tt>Unexpected op: <q>[% op | html %]</q></tt>
+[% END %]
+</form>

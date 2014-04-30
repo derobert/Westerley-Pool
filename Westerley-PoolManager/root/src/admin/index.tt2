@@ -27,3 +27,14 @@
     </td>
   </tr>
 </table>
+
+<h1>Print Passes</h1>
+[% count = passes_to_issue.count %]
+[% IF count %]
+There are [% count %] passes to print. You may <a
+href="[%issue_uri|html%]">print (issue) passes</a>.
+[% ELSE %]
+There are no unprinted passes. If you need to print a pass for someone,
+either enter the person into the system or first invalidate the existing
+pass.
+[% END %]

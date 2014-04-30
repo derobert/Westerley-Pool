@@ -47,6 +47,52 @@ sub index :Path :Args(0) {
 		$c->model('Pool::Street')->search(undef, {order_by => 'street_name'})
 			->all
 		];
+
+	$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
+		->search( { 'passes.pass_num' => undef }, { join => 'passes' });
+	$c->stash->{issue_uri} = $c->uri_for_action('/admin/issue');
+}
+
+sub issue : Path('/pass/issue') Args(0) {
+    my ( $self, $c ) = @_;
+	my $op = $c->req->params->{op} // 'list';
+	$c->stash->{op} = $op;
+
+	if ('list' eq $op) {
+		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
+			->search( { 'passes.pass_num' => undef },
+				{ join => 'passes', order_by => 'me.holder_name' });
+		$c->detach;
+	} elsif ('issue' eq $op || 'print' eq $op) { 
+		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
+			->search(
+				{ passholder_num => [ $c->req->params->get_all('which') ] },
+				{ order_by => 'me.holder_name' }
+			);
+	} else { 
+		die "Invalid op: $op";
+	}
+
+	# issue passes
+	my @passes;
+	if ('issue' eq $op) {
+		foreach my $phnum ($c->req->params->get_all('which')) {
+			my $pnum = int rand 2**31;
+			push @passes, $c->model('Pool::Pass')->create({
+					passholder_num => $phnum,
+					pass_num => $pnum,
+			});
+			$c->log->info("Created pass for $phnum: pass $pnum");
+		}
+	} elsif ('print' eq $op) {
+		die "Load passes to reprint from db";
+	}
+
+	# print passes
+	$c->stash->{passes} = \@passes;
+	$c->forward('View::PassesPDF');
+	
+
 }
 
 sub show_unit :Path('/unit') Args(1) {

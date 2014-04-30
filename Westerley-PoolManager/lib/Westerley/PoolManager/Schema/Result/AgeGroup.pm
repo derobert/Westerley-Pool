@@ -155,7 +155,7 @@ __PACKAGE__->inflate_column('age_group_color', {
 	}, deflate => sub {
 		my ($col, $rs) = @_;
 
-		'(' . join(q{,}, $col->red, $col->green, $col->blue) . ')';
+		'(' . join(q{,}, $col->as_list) . ')';
 	}
 });
 
