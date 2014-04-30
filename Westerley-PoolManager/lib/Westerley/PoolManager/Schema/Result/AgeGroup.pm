@@ -51,6 +51,11 @@ __PACKAGE__->table("age_groups");
   is_nullable: 0
   size: 100
 
+=head2 age_group_color
+
+  data_type: 'rgb_color'
+  is_nullable: 0
+
 =head2 min_age
 
   data_type: 'interval'
@@ -73,6 +78,8 @@ __PACKAGE__->add_columns(
   },
   "age_group_name",
   { data_type => "varchar", is_nullable => 0, size => 100 },
+  "age_group_color",
+  { data_type => "rgb_color", is_nullable => 0 },
   "min_age",
   { data_type => "interval", is_nullable => 0 },
   "max_age",
@@ -130,8 +137,8 @@ __PACKAGE__->add_unique_constraint("age_groups_max_age_key", ["max_age"]);
 __PACKAGE__->add_unique_constraint("age_groups_min_age_key", ["min_age"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-12 01:01:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4JqykqSZKRpt0beoZY95DQ
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-29 22:44:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:e6pg+cm5aIeM5VK/tWrlfg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

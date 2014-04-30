@@ -70,6 +70,7 @@ __PACKAGE__->table("passholders");
 =head2 holder_suspended
 
   data_type: 'boolean'
+  default_value: false
   is_nullable: 0
 
 =head2 holder_notes
@@ -102,7 +103,7 @@ __PACKAGE__->add_columns(
   "holder_can_swim",
   { data_type => "boolean", is_nullable => 0 },
   "holder_suspended",
-  { data_type => "boolean", is_nullable => 0 },
+  { data_type => "boolean", default_value => \"false", is_nullable => 0 },
   "holder_notes",
   { data_type => "text", default_value => "", is_nullable => 0 },
   "holder_photo",
@@ -173,8 +174,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-23 00:17:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q9/ui06aeYolsgW+Umziew
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-29 22:22:46
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:etkDLy9FLuy+IH4AG9T1nQ
 
 __PACKAGE__->column_info('holder_notes')->{remove_column} = 0;
 

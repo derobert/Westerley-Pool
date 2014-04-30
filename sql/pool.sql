@@ -1,6 +1,18 @@
+CREATE DOMAIN rgb_color_value AS real
+  CONSTRAINT color_value_range
+  NOT NULL
+  CHECK (VALUE >= 0 AND VALUE <= 1);
+
+CREATE TYPE rgb_color AS (
+	red            rgb_color_value,
+	green          rgb_color_value,
+	blue           rgb_color_value
+);
+
 CREATE TABLE age_groups (
 	age_group_num  SERIAL NOT NULL PRIMARY KEY,
 	age_group_name VARCHAR(100) NOT NULL UNIQUE,
+	age_group_color rgb_color NOT NULL,
 	min_age        INTERVAL YEAR TO MONTH NOT NULL UNIQUE, -- ≥ (gte)
 	max_age        INTERVAL YEAR TO MONTH NOT NULL UNIQUE  -- < (lt)
 	-- NOTE: PostgreSQL supports intervals up to 178000000 years,
