@@ -8,6 +8,7 @@ use Gtk2;
 use Data::Dump qw(pp);
 use File::Temp;
 use List::Util qw(max);
+use Carp;
 
 extends 'Catalyst::View';
 
@@ -228,7 +229,7 @@ sub _plot_one_pass {
 	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
 
 	my $passholder = $pass->search_related('passholder', undef,
-		{'+columns' => 'holder_photo', 'prefetch' => 'age_group'})->single;
+		{'+columns' => 'holder_photo', 'prefetch' => { family => { unit => 'street' }, age_group => undef } })->single;
 
 	# photo
 	$cr->save;
@@ -240,13 +241,116 @@ sub _plot_one_pass {
 	$cr->set_source_rgb($passholder->age_group->age_group_color->as_list);
 	$cr->rectangle(0, 1.75, 3.5, .25);
 	$cr->fill;
+	$cr->set_source_rgb(0, 0, 0);
+	$self->_plot_text($cr,
+		{
+			text => $passholder->age_group->age_group_name,
+			rect => [0, 1.75, 3.5, 2],
+			font => 'DejaVu Sans Bold 10',
+			align => 'center',
+			valign => 'middle',
+		});
 
+	# name
+	$cr->set_source_rgb(0, 0, 0);
+	$self->_plot_text($cr,
+		{
+			text => $passholder->holder_name,
+			rect => [15/16, 1/32, 3.375, 17/32],
+			font => 'DejaVu Serif Bold 13',
+		});
+
+	# address
+	my $addr = $passholder->family->unit->house_number
+	         . ' '
+	         . $passholder->family->unit->street->street_name;
+	$self->_plot_text($cr,
+		{
+			text => $addr,
+			rect => [15/16, 18/32, 3.375, 23/32],
+			font => 'DejaVu Serif Bold 8',
+		});
+
+	# notes 
+	$self->_plot_text($cr,
+		{
+			text => $passholder->holder_notes,
+			rect => [1.05, 24/32, 3.375, 1.75],
+			font => 'DejaVu Serif 8',
+			justify => 1,
+		});
 
 	# DEBUG #
 	$cr->set_source_rgb(0, 0, 0);
 	$cr->rectangle(0, 0, 3.5, 2);
 	$cr->set_line_width(0.5/72);
 	$cr->stroke;
+
+	$cr->restore;
+}
+
+sub _plot_text {
+	my ($self, $cr, $opts) = @_;
+	defined $opts->{text} or croak "_plot_text requires text";
+	defined $opts->{rect} or croak "_plot_text requires a rect";
+	defined $opts->{font} or croak "_plot_text requires a font";
+	$opts->{justify} //= 0;
+	$opts->{align} //= 'left';
+	$opts->{singlepar} //= 1;
+	$opts->{valign} //= 'top';
+
+	my $width = $opts->{rect}[2] - $opts->{rect}[0];
+	my $height = $opts->{rect}[3] - $opts->{rect}[1];
+	croak "width < 0" if $width < 0;
+	croak "height < 0" if $height < 0;
+
+	$cr->save;
+
+	# DEBUG
+	#$cr->rectangle($opts->{rect}[0], $opts->{rect}[1], $width, $height);
+	#$cr->set_line_width(0.5/72);
+	#$cr->stroke;
+
+	$cr->move_to($opts->{rect}[0], $opts->{rect}[1]);
+
+	# pango seems to not work with tiny resolutions... so let's give it
+	# something around the actual device resolution.
+	$cr->scale(1/600, 1/600);
+
+	my $layout = Pango::Cairo::create_layout($cr);
+	Pango::Cairo::Context::set_resolution($layout->get_context, 600);
+	$layout->context_changed;
+	$layout->set_ellipsize('middle');
+	$layout->set_width(Pango->scale * 600 * $width);
+	$layout->set_height(Pango->scale * 600 * $height);
+	$layout->set_wrap('word_char');
+	$layout->set_justify($opts->{justify});
+	$layout->set_alignment($opts->{align});
+	$layout->set_single_paragraph_mode($opts->{singlepar});
+	$layout->set_text($opts->{text});
+	$layout->set_font_description(
+		Pango::FontDescription->from_string($opts->{font}));
+
+	if ('top' ne $opts->{valign}) {
+		# no built-in pango way AFAIK.
+		my (undef, $h) = $layout->get_size;
+		$h /= 600 * Pango->scale;
+
+		my $offset;
+		if ('middle' eq $opts->{valign}) {
+			$offset = ($height-$h) / 2;
+		} elsif ('bottom' eq $opts->{valign}) {
+			$offset = $height-$h;
+		} else {
+			croak "Unknown valign: $opts->{valign}";
+		}
+
+		$cr->move_to(600 * $opts->{rect}[0],
+			600 * ($offset + $opts->{rect}[1]));
+	}
+
+	Pango::Cairo::show_layout($cr, $layout);
+
 
 	$cr->restore;
 }
