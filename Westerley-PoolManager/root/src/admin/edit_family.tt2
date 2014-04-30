@@ -103,3 +103,5 @@
     Add New Passholder
   </button>
 </form>
+
+<a href="[% C.uri_for('/admin') %]">Back to Admin</a>

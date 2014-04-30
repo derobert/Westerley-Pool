@@ -24,3 +24,5 @@
     Delete Selected Family
   </button>
 </form>
+
+<a href="[% C.uri_for('/admin') %]">Back to Admin</a>
