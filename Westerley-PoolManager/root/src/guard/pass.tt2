@@ -1,8 +1,8 @@
 ﻿[% IF pass %]
   [% IF pass.passholder %]
-<table>
-
 <span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
+
+<table>
 <tr>
   <td class="label member-name-label">Name:</td>
   <td class="value member-name-value">[% pass.passholder.holder_name | html %]</td>
@@ -33,8 +33,9 @@
 </tr>
 <tr>
   <td class="label member-swimmer-label">Age Group:</td>
-  <td class="value member-swimmer-value">
+  <td class="value member-swimmer-value" style="background: [% pass.passholder.age_group.age_group_color.css %]">
     [% pass.passholder.age_group.age_group_name | html %]
+    
   </td>
 </tr>
 <tr>

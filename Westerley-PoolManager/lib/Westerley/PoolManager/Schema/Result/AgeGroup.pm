@@ -140,7 +140,24 @@ __PACKAGE__->add_unique_constraint("age_groups_min_age_key", ["min_age"]);
 # Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-29 22:44:01
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:e6pg+cm5aIeM5VK/tWrlfg
 
+use Westerley::PoolManager::Color;
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+__PACKAGE__->inflate_column('age_group_color', {
+	inflate => sub {
+		my ($val, $rs) = @_;
+		$val =~ /^\(([0-9.]+),([0-9.]+),([0-9.]+)\)$/
+			or die "Invalud color: $val";
+		Westerley::PoolManager::Color->new(
+			red => $1,
+			green => $2,
+			blue => $3
+		);
+	}, deflate => sub {
+		my ($col, $rs) = @_;
+
+		'(' . join(q{,}, $col->red, $col->green, $col->blue) . ')';
+	}
+});
+
 __PACKAGE__->meta->make_immutable;
 1;
