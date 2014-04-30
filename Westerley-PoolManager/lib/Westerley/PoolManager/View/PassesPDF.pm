@@ -9,6 +9,7 @@ use Data::Dump qw(pp);
 use File::Temp;
 use List::Util qw(max);
 use Carp;
+use Barcode::Code128;
 
 extends 'Catalyst::View';
 
@@ -106,6 +107,11 @@ has rows => (
 	isa     => 'Int',
 	lazy    => 1,
 	builder => '_build_rows',
+);
+
+has _barcode => (
+	is      => 'ro',
+	default => sub { Barcode::Code128->new() },
 );
 
 sub _build_columns {
@@ -267,7 +273,7 @@ sub _plot_one_pass {
 	$self->_plot_text($cr,
 		{
 			text => $addr,
-			rect => [15/16, 18/32, 3.375, 23/32],
+			rect => [1.6, 1.4, 3.375, 1.75],
 			font => 'DejaVu Serif Bold 8',
 		});
 
@@ -275,10 +281,28 @@ sub _plot_one_pass {
 	$self->_plot_text($cr,
 		{
 			text => $passholder->holder_notes,
-			rect => [1.05, 24/32, 3.375, 1.75],
+			rect => [1.05, 18/32, 3.375, 1.375],
 			font => 'DejaVu Serif 8',
 			justify => 1,
 		});
+
+	# bar code
+	$cr->save;
+	$cr->translate(0.15, 1.4);
+	$cr->scale(1.25, 0.25);
+	$self->_plot_barcode($cr, $pass->pass_num);
+	$cr->restore;
+
+	$self->_plot_text($cr, 
+		{
+			text => $pass->pass_num,
+			rect => [0.15, 1.4+0.25, 0.15+1.25, 1.75],
+			font => 'DejaVu Serif 7',
+			align => 'center',
+		});
+
+	# TODO: page 2
+	# TODO: issue date
 
 	# DEBUG #
 	$cr->set_source_rgb(0, 0, 0);
@@ -287,6 +311,29 @@ sub _plot_one_pass {
 	$cr->stroke;
 
 	$cr->restore;
+}
+
+sub _plot_barcode {
+	my ($self, $cr, $num_raw) = @_;
+	my $num = sprintf('%10i', $num_raw);
+	my $code = $self->_barcode->barcode($num);
+	my $code_len = length($code);
+
+	print STDERR "Code length = $code_len.\nCode: $code\n\n";
+
+	$cr->save;
+	$cr->scale(1/$code_len, 1);
+	for (my $x = 0; $x < $code_len; ++$x) {
+		$cr->rectangle($x, 0, 1, 1);
+		if ('#' eq substr($code, $x, 1)) {
+			$cr->set_source_rgb(0,0,0);
+		} else {
+			$cr->set_source_rgb(1,1,1);
+		}
+		$cr->fill;
+	}
+
+	$cr->restore
 }
 
 sub _plot_text {
