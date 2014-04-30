@@ -24,6 +24,11 @@ requires 'DBIx::Class::Helper::ResultSet::RemoveColumns' => '2.021001';
 
 requires 'DBD::Pg';
 
+requires 'Cairo';
+requires 'Pango';
+requires 'Gtk2';
+requires 'Barcode::Code128';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
