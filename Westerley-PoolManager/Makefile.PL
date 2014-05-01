@@ -23,6 +23,7 @@ requires 'DBIx::Class::Helper::ResultSet::AutoRemoveColumns' => '2.021001';
 requires 'DBIx::Class::Helper::ResultSet::RemoveColumns' => '2.021001';
 
 requires 'DBD::Pg';
+requires 'DateTime::Format::Pg';
 
 requires 'Cairo';
 requires 'Pango';
