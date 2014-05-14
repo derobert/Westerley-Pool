@@ -95,6 +95,13 @@ has pass_spacing_tb => (
 	default => 0.125,
 );
 
+has crop_mark_size => (
+	# note! scaled by the pass size. In inches at default 3.5×2" size.
+	is      => 'ro',
+	isa     => 'Num',
+	default => 3/64,
+);
+
 has columns => (
 	is      => 'ro',
 	isa     => 'Int',
@@ -303,13 +310,25 @@ sub _plot_one_pass {
 			align => 'center',
 		});
 
-	# TODO: page 2
-	# TODO: issue date
-
-	# DEBUG #
+	# crop marks
 	$cr->set_source_rgb(0, 0, 0);
-	$cr->rectangle(0, 0, 3.5, 2);
-	$cr->set_line_width(0.5/72);
+	$cr->move_to(0, 0);    # top-left
+	$cr->rel_line_to(0, -$self->crop_mark_size);
+	$cr->move_to(0, 0);
+	$cr->rel_line_to(-$self->crop_mark_size, 0);
+	$cr->move_to(3.5, 0);    # top-right
+	$cr->rel_line_to(0, -$self->crop_mark_size);
+	$cr->move_to(3.5, 0);
+	$cr->rel_line_to($self->crop_mark_size, 0);
+	$cr->move_to(0, 2);      # bot-left
+	$cr->rel_line_to(0, $self->crop_mark_size);
+	$cr->move_to(0, 2);
+	$cr->rel_line_to(-$self->crop_mark_size, 0);
+	$cr->move_to(3.5, 2);    # bot-right
+	$cr->rel_line_to(0, $self->crop_mark_size);
+	$cr->move_to(3.5, 2);
+	$cr->rel_line_to($self->crop_mark_size, 0);
+	$cr->set_line_width(0.5 / 72);
 	$cr->stroke;
 
 	$cr->restore;
