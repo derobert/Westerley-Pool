@@ -8,6 +8,7 @@ use Gtk2;
 use Data::Dump qw(pp);
 use File::Temp;
 use List::Util qw(max);
+use List::MoreUtils qw(natatime);
 use Carp;
 use Barcode::Code128;
 
@@ -205,28 +206,35 @@ sub process {
 	my $cr = Cairo::Context->create($surface);
 	$cr->scale(72, 72);
 
-	my $col = 0;
-	my $row = 0;
-	foreach my $pass (@{$c->stash->{passes}}) {
-		my $xpos = $self->paper_margin_left
-		         + $col * ($self->pass_width + $self->pass_spacing_lr);
-		my $ypos = $self->paper_margin_top
-		         + $row * ($self->pass_height + $self->pass_spacing_tb);
+	my $cards_per_page = $self->columns * $self->rows;
+	my $page_iter = natatime $cards_per_page, @{$c->stash->{passes}};
 
-		$cr->save;
-		$cr->translate($xpos, $ypos);
-		$self->_plot_one_pass($cr, $pass);
-		$cr->restore;
+	while (my @this_page = $page_iter->()) {
+		foreach my $method (\&_plot_one_pass_front, \&_plot_one_pass_back) {
+			my $col = 0;
+			my $row = 0;
+			foreach my $pass (@this_page) {
+				my $xpos = $self->paper_margin_left
+						 + $col * ($self->pass_width + $self->pass_spacing_lr);
+				my $ypos = $self->paper_margin_top
+						 + $row * ($self->pass_height + $self->pass_spacing_tb);
 
-		if (++$col >= $self->columns) {
-			$col = 0;
-			if (++$row >= $self->rows) {
-				die "handle page 2";
+				$cr->save;
+				$cr->translate($xpos, $ypos);
+				$self->$method($cr, $pass);
+				$cr->restore;
+
+				if (++$col >= $self->columns) {
+					$col = 0;
+					if (++$row >= $self->rows) {
+						die "handle page 2";
+					}
+				}
 			}
+			
+			$cr->show_page;
 		}
 	}
-	
-	$cr->show_page;
 
 	# need to get rid of these else the PDF isn't done.
 	$cr = undef;
@@ -238,7 +246,7 @@ sub process {
 	$c->stash->{pdffile} = $temp;
 }
 
-sub _plot_one_pass {
+sub _plot_one_pass_front {
 	my ($self, $cr, $pass) = @_;
 	$cr->save;
 	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
@@ -311,6 +319,35 @@ sub _plot_one_pass {
 		});
 
 	# crop marks
+	$self->_plot_cropmarks($cr);
+
+	$cr->restore;
+}
+
+sub _plot_one_pass_back {
+	my ($self, $cr, $pass) = @_;
+	$cr->save;
+	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
+
+	$self->_plot_text($cr, 
+		{
+			text => _add_spaces($pass->pass_num),
+			rect => [0, 0, 3.5, 2],
+			font => 'DejaVu Serif 20',
+			align => 'center',
+			valign => 'middle',
+		});
+	
+	# crop marks
+	$self->_plot_cropmarks($cr);
+
+	$cr->restore;
+}
+
+sub _plot_cropmarks {
+	my ($self, $cr) = @_;
+
+	$cr->save;
 	$cr->set_source_rgb(0, 0, 0);
 	$cr->move_to(0, 0);    # top-left
 	$cr->rel_line_to(0, -$self->crop_mark_size);
@@ -328,9 +365,8 @@ sub _plot_one_pass {
 	$cr->rel_line_to(0, $self->crop_mark_size);
 	$cr->move_to(3.5, 2);
 	$cr->rel_line_to($self->crop_mark_size, 0);
-	$cr->set_line_width(0.5 / 72);
+	$cr->set_line_width(1 / 8 / 72);
 	$cr->stroke;
-
 	$cr->restore;
 }
 
