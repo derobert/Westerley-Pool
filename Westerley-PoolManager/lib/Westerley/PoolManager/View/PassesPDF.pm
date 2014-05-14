@@ -297,7 +297,7 @@ sub _plot_one_pass {
 
 	$self->_plot_text($cr, 
 		{
-			text => $pass->pass_num,
+			text => _add_spaces($pass->pass_num),
 			rect => [0.15, 1.4+0.25, 0.15+_BARCODE_WIDTH, 1.75],
 			font => 'DejaVu Serif 7',
 			align => 'center',
@@ -313,6 +313,12 @@ sub _plot_one_pass {
 	$cr->stroke;
 
 	$cr->restore;
+}
+
+sub _add_spaces {
+	my $s = shift;
+	$s =~ s/(...)(?=.)/$1 /g;
+	return $s;
 }
 
 sub _plot_barcode {
