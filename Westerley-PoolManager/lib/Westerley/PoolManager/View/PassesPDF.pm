@@ -290,8 +290,10 @@ sub _plot_one_pass_front {
 	$self->_plot_text($cr,
 		{
 			text => $addr,
-			rect => [2*0.15+_BARCODE_WIDTH, 1.4, 3.375, 1.75],
+			rect => [2*0.15+_BARCODE_WIDTH, 1.275, 3.375, 1.645],
 			font => 'DejaVu Serif Bold 8',
+			align => 'right',
+			valign => 'middle',
 		});
 
 	# notes 
