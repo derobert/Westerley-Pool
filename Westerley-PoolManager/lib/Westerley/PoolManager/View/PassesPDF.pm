@@ -114,6 +114,8 @@ has _barcode => (
 	default => sub { Barcode::Code128->new() },
 );
 
+use constant _BARCODE_WIDTH => 1.5; # inches
+
 sub _build_columns {
 	my $self = shift;
 	$self->_count_tiles(
@@ -273,7 +275,7 @@ sub _plot_one_pass {
 	$self->_plot_text($cr,
 		{
 			text => $addr,
-			rect => [1.6, 1.4, 3.375, 1.75],
+			rect => [2*0.15+_BARCODE_WIDTH, 1.4, 3.375, 1.75],
 			font => 'DejaVu Serif Bold 8',
 		});
 
@@ -288,15 +290,15 @@ sub _plot_one_pass {
 
 	# bar code
 	$cr->save;
-	$cr->translate(0.15, 1.4);
-	$cr->scale(1.25, 0.25);
+	$cr->translate(0.15, 1.275);
+	$cr->scale(_BARCODE_WIDTH, 0.370);
 	$self->_plot_barcode($cr, $pass->pass_num);
 	$cr->restore;
 
 	$self->_plot_text($cr, 
 		{
 			text => $pass->pass_num,
-			rect => [0.15, 1.4+0.25, 0.15+1.25, 1.75],
+			rect => [0.15, 1.4+0.25, 0.15+_BARCODE_WIDTH, 1.75],
 			font => 'DejaVu Serif 7',
 			align => 'center',
 		});
