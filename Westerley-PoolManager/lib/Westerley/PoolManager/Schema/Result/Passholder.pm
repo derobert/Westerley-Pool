@@ -82,7 +82,7 @@ __PACKAGE__->table("passholders");
 =head2 holder_photo
 
   data_type: 'bytea'
-  is_nullable: 0
+  is_nullable: 1
 
 =cut
 
@@ -107,7 +107,7 @@ __PACKAGE__->add_columns(
   "holder_notes",
   { data_type => "text", default_value => "", is_nullable => 0 },
   "holder_photo",
-  { data_type => "bytea", is_nullable => 0 },
+  { data_type => "bytea", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -174,8 +174,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-29 22:22:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:etkDLy9FLuy+IH4AG9T1nQ
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-05-13 20:30:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1DOfqIb6VEmk7cDIXJ5lbg
 
 __PACKAGE__->column_info('holder_notes')->{remove_column} = 0;
 

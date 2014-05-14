@@ -20,6 +20,7 @@ sub search_issuable {
 
 	$self->schema->resultset('Passholder')->search({
 			'passes.pass_num' => undef,
+			'me.holder_photo' => {'!=', undef},
 		}, {join => 'passes', %$extra});
 }
 

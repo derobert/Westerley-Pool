@@ -74,7 +74,7 @@ CREATE TABLE passholders (
 	holder_suspended BOOLEAN NOT NULL DEFAULT false,
 
 	holder_notes    TEXT NOT NULL DEFAULT '',
-	holder_photo    BYTEA NOT NULL,
+	holder_photo    BYTEA NULL,
 
 	UNIQUE(holder_name, family_num)
 );
