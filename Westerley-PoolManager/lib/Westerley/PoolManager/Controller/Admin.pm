@@ -48,8 +48,7 @@ sub index :Path :Args(0) {
 			->all
 		];
 
-	$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
-		->search( { 'passes.pass_num' => undef }, { join => 'passes' });
+	$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable;
 	$c->stash->{issue_uri} = $c->uri_for_action('/admin/issue');
 }
 
@@ -59,9 +58,10 @@ sub issue : Path('/pass/issue') Args(0) {
 	$c->stash->{op} = $op;
 
 	if ('list' eq $op) {
-		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
-			->search( { 'passes.pass_num' => undef },
-				{ join => 'passes', order_by => 'me.holder_name' });
+		$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable({order_by => 'me.holder_name' });
+		#$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
+		#	->search( { 'passes.pass_num' => undef },
+		#		{ join => 'passes', );
 		$c->detach;
 	} elsif ('issue' eq $op || 'print' eq $op) { 
 		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')

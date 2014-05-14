@@ -14,6 +14,15 @@ __PACKAGE__->config(
     }
 );
 
+sub search_issuable {
+	my ($self, $extra) = @_;
+	$extra //= {};
+
+	$self->schema->resultset('Passholder')->search({
+			'passes.pass_num' => undef,
+		}, {join => 'passes', %$extra});
+}
+
 =head1 NAME
 
 Westerley::PoolManager::Model::Pool - Catalyst DBIC Schema Model
