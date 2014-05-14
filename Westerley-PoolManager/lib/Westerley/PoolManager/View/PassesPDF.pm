@@ -298,7 +298,7 @@ sub _plot_one_pass_front {
 	$self->_plot_text($cr,
 		{
 			text => $passholder->holder_notes,
-			rect => [1.05, 18/32, 3.375, 1.375],
+			rect => [1.05, 17/32, 3.375, 1.275],
 			font => 'DejaVu Serif 8',
 			justify => 1,
 		});
@@ -381,8 +381,6 @@ sub _plot_barcode {
 	my $num = sprintf('%10i', $num_raw);
 	my $code = $self->_barcode->barcode($num);
 	my $code_len = length($code);
-
-	print STDERR "Code length = $code_len.\nCode: $code\n\n";
 
 	$cr->save;
 	$cr->scale(1/$code_len, 1);
