@@ -492,7 +492,7 @@ sub _add_spaces {
 
 sub _plot_barcode {
 	my ($self, $cr, $num_raw) = @_;
-	my $num = sprintf('%10i', $num_raw);
+	my $num = sprintf('%010i', $num_raw);
 	my $code = $self->_barcode->barcode($num);
 	my $code_len = length($code);
 
