@@ -96,6 +96,23 @@ has pass_spacing_tb => (
 	default => 0.125,
 );
 
+# when you're looking from the front (e.g., with light shining through),
+# how much does the image on the back need to be shifted leftwards to
+# make the crop marks on both sides line up? (negative = right)
+has reverse_side_left_shift => (
+	is      => 'ro',
+	isa     => 'Num',
+	default => 0,
+);
+
+# and how much up? (negative = down)
+has reverse_side_up_shift => (
+	is      => 'ro',
+	isa     => 'Num',
+	default => 1/16,
+);
+
+
 has crop_mark_size => (
 	# note! scaled by the pass size. In inches at default 3.5×2" size.
 	is      => 'ro',
@@ -209,19 +226,50 @@ sub process {
 	my $cards_per_page = $self->columns * $self->rows;
 	my $page_iter = natatime $cards_per_page, @{$c->stash->{passes}};
 
+	my @sides = ({
+			plot => \&_plot_one_pass_front,
+			xpos => sub {
+				$self->paper_margin_left 
+					+ $_[0] * ($self->pass_width + $self->pass_spacing_lr);
+			},
+			yadj => 0,
+		},
+		{
+			plot => \&_plot_one_pass_back,
+			xpos => sub {
+				# right margin eats the remaining width
+				$self->paper_width - $self->paper_margin_left
+					+ $self->reverse_side_left_shift
+					- $self->pass_width
+					- $_[0] * ($self->pass_width + $self->pass_spacing_lr);
+			},
+			yadj => -$self->reverse_side_up_shift,
+	});
+
 	while (my @this_page = $page_iter->()) {
-		foreach my $method (\&_plot_one_pass_front, \&_plot_one_pass_back) {
+		foreach my $side (@sides) {
 			my $col = 0;
 			my $row = 0;
 			foreach my $pass (@this_page) {
-				my $xpos = $self->paper_margin_left
-						 + $col * ($self->pass_width + $self->pass_spacing_lr);
+				my $xpos = $side->{xpos}($col);
 				my $ypos = $self->paper_margin_top
+				         + $side->{yadj}
 						 + $row * ($self->pass_height + $self->pass_spacing_tb);
+
+				my $passholder = $pass->search_related('passholder', undef,
+					{
+						'+columns' => 'holder_photo',
+						'prefetch' => {
+							family => {unit => 'street'},
+							age_group => undef,
+						}
+					}
+				)->single;
 
 				$cr->save;
 				$cr->translate($xpos, $ypos);
-				$self->$method($cr, $pass);
+				my $method = $side->{plot};
+				$self->$method($cr, $pass, $passholder);
 				$cr->restore;
 
 				if (++$col >= $self->columns) {
@@ -247,12 +295,9 @@ sub process {
 }
 
 sub _plot_one_pass_front {
-	my ($self, $cr, $pass) = @_;
+	my ($self, $cr, $pass, $passholder) = @_;
 	$cr->save;
 	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
-
-	my $passholder = $pass->search_related('passholder', undef,
-		{'+columns' => 'holder_photo', 'prefetch' => { family => { unit => 'street' }, age_group => undef } })->single;
 
 	# photo
 	$cr->save;
@@ -326,18 +371,61 @@ sub _plot_one_pass_front {
 	$cr->restore;
 }
 
+sub _escape {
+	# trivial and simple, surprised Catalyst doesn't provide...
+	my $s = shift;
+
+	$s =~ s/&/&amp;/g;
+	$s =~ s/</&lt;/g;
+	$s =~ s/>/&gt;/g;
+
+	return $s;
+}
+
+sub _nobreak {
+	# convert space to nonbreak
+	my $s = shift;
+
+	$s =~ y/ /\N{NO-BREAK SPACE}/;
+
+	return $s;
+}
+
 sub _plot_one_pass_back {
-	my ($self, $cr, $pass) = @_;
+	my ($self, $cr, $pass, $passholder) = @_;
 	$cr->save;
 	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
 
-	$self->_plot_text($cr, 
+	my @contacts = $passholder->family->search_related(
+		'contacts',
+		{contact_emergency => 1},
 		{
-			text => _add_spaces($pass->pass_num),
-			rect => [0, 0, 3.5, 2],
-			font => 'DejaVu Serif 20',
-			align => 'center',
-			valign => 'middle',
+			prefetch => 'contact_phones',
+			order_by => ['me.contact_order', 'contact_phones.phone_label'],
+		});
+
+	my $markup = qq{<b><big>Emergency Contacts:</big></b>\n};
+	foreach my $contact (@contacts) {
+		$markup .= '<b>' . _escape($contact->contact_name) . '</b>';
+		foreach my $phone ($contact->contact_phones) {
+			$markup .= ' <span size="smaller" font_variant="smallcaps">['
+			        . _escape($phone->phone_label)
+			        . ']</span>'
+			        . "\N{NO-BREAK SPACE}"
+			        . _escape(_nobreak($phone->phone_number));
+		}
+		$markup .= " <i>(Note:\N{NO-BREAK SPACE}" . _escape($contact->contact_notes) . ')</i>'
+			if ($contact->contact_notes ne '');
+		$markup .= "\n";
+	}
+
+	$self->_plot_text($cr,
+		{
+			markup => $markup,
+			rect => [1/8, 1/8, 3.5-1/8, 2-1/8],
+			font => 'DejaVu Serif 8',
+			justify => 0,
+			singlepar => 0,
 		});
 	
 	# crop marks
@@ -401,13 +489,19 @@ sub _plot_barcode {
 
 sub _plot_text {
 	my ($self, $cr, $opts) = @_;
-	defined $opts->{text} or croak "_plot_text requires text";
 	defined $opts->{rect} or croak "_plot_text requires a rect";
 	defined $opts->{font} or croak "_plot_text requires a font";
 	$opts->{justify} //= 0;
 	$opts->{align} //= 'left';
 	$opts->{singlepar} //= 1;
 	$opts->{valign} //= 'top';
+
+	defined $opts->{text}
+		or defined $opts->{markup}
+		or croak "_plot_text requires text or markup";
+	defined $opts->{text}
+		and defined $opts->{markup}
+		and croak "_plot_text requires EITHER text OR markup (XOR)";
 
 	my $width = $opts->{rect}[2] - $opts->{rect}[0];
 	my $height = $opts->{rect}[3] - $opts->{rect}[1];
@@ -437,7 +531,8 @@ sub _plot_text {
 	$layout->set_justify($opts->{justify});
 	$layout->set_alignment($opts->{align});
 	$layout->set_single_paragraph_mode($opts->{singlepar});
-	$layout->set_text($opts->{text});
+	$layout->set_text($opts->{text})     if defined $opts->{text};
+	$layout->set_markup($opts->{markup}) if defined $opts->{markup};
 	$layout->set_font_description(
 		Pango::FontDescription->from_string($opts->{font}));
 
