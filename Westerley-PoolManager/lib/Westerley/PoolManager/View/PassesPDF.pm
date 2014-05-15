@@ -109,7 +109,7 @@ has reverse_side_left_shift => (
 has reverse_side_up_shift => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 1/16,
+	default => 0,
 );
 
 
