@@ -112,6 +112,14 @@ has reverse_side_up_shift => (
 	default => 0,
 );
 
+# custom message to print on the back of the card. Note this is in Pango
+# markup, see
+# <https://developer.gnome.org/pango/unstable/PangoMarkupFormat.html>
+has custom_message => (
+	is      => 'ro',
+	isa     => 'Str',
+	default => '',
+);
 
 has crop_mark_size => (
 	# note! scaled by the pass size. In inches at default 3.5×2" size.
@@ -419,13 +427,25 @@ sub _plot_one_pass_back {
 		$markup .= "\n";
 	}
 
+	my $box = [2/32, 2/32, 3.5-2/32, 2-2/32];
 	$self->_plot_text($cr,
 		{
 			markup => $markup,
-			rect => [1/8, 1/8, 3.5-1/8, 2-1/8],
+			rect => $box,
 			font => 'DejaVu Serif 8',
 			justify => 0,
 			singlepar => 0,
+		});
+
+	pp $self->custom_message;
+	'' ne $self->custom_message and $self->_plot_text($cr,
+		{
+			markup => $self->custom_message,
+			rect => $box,
+			font => 'DejaVu Serif 8',
+			justify => 1,
+			singlepar => 0,
+			valign => 'bottom',
 		});
 	
 	# crop marks
