@@ -427,6 +427,10 @@ sub _plot_one_pass_back {
 		$markup .= "\n";
 	}
 
+	# TODO: issue date. See the fix-me in C/Admin.pm
+
+	# yes, these overlap, but the custom message is aligned to the
+	# bottom. Going to hope they never cross :-D
 	my $box = [2/32, 2/32, 3.5-2/32, 2-2/32];
 	$self->_plot_text($cr,
 		{

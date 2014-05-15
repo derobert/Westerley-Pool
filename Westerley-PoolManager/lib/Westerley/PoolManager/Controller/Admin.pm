@@ -82,6 +82,7 @@ sub issue : Path('/pass/issue') Args(0) {
 					passholder_num => $phnum,
 					pass_num => $pnum,
 			});
+			# FIXME: Reload from DB to get the issue date.
 			$c->log->info("Created pass for $phnum: pass $pnum");
 		}
 	} elsif ('print' eq $op) {
