@@ -1,0 +1,13 @@
+[Unit]
+Description=Westerley Pool Manager web app via starman
+Requires=postgresql.service
+After=postgresql.service
+
+[Service]
+# would do simple, but Starman doesn't do socket activation AFAIK
+Type=forking
+PIDFile=/run/westerley-pool-mgr.pid 
+Restart=always
+RestartSec=5
+PrivateTmp=true
+ExecStart=/usr/bin/starman -D --error-log /var/log/pool-manager/error.log --access-log /var/log/pool-manager/access.log --pid /run/westerley-pool-mgr.pid -l :80 --workers 5 --user pool-mgr --group pool-mgr /home/pool-mgr/Westerley-Pool/Westerley-PoolManager/westerley_poolmanager.psgi
