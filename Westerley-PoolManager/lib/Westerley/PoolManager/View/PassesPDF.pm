@@ -297,7 +297,8 @@ sub process {
 	$surface = undef;
 
 	# DEBUG: show instead of print
-	system { 'gv' } 'gv', $temp;
+	# system { 'gv' } 'gv', $temp;
+	system { 'lpr' } 'lpr', qw(-P Officejet_Pro_L7600_HPSetup -o OutputMode=Best -o Duplex=DuplexNoTumble), $temp;
 
 	$c->stash->{pdffile} = $temp;
 }
