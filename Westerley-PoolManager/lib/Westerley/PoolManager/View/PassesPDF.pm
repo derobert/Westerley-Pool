@@ -75,13 +75,13 @@ has paper_margin_bottom => (
 has pass_width => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 3.5,
+	default => 3.125,
 );
 
 has pass_height => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 2,
+	default => 1.875,
 );
 
 has pass_spacing_lr => (
@@ -167,7 +167,6 @@ has _barcode => (
 	default => sub { Barcode::Code128->new() },
 );
 
-use constant _BARCODE_WIDTH => 1.5; # inches
 
 sub _build_columns {
 	my $self = shift;
@@ -204,6 +203,11 @@ sub _count_tiles {
 sub BUILD {
 	my $self = shift;
 
+	# wider surely works, taller at least isn't broken.
+	$self->pass_height >= 1.874 or die "Shorter than 1⅞ probably broken";
+	$self->pass_width >= 3.124 or die "Narrower than 3⅛ probably broken";
+
+	# well, not so large it doesn't fit on the paper!
 	$self->columns > 0 or die "Must have a least one column";
 	$self->rows > 0    or die "Must have a least one row";
 
@@ -323,76 +327,91 @@ sub process {
 	$c->stash->{pdffile} = $temp;
 }
 
+use constant {
+	# front
+	PHOTO_HEIGHT   => 1 + 4/32,
+	PHOTO_SPACING  => 0 + 2/32,
+	FRONT_MARGIN   => 0 + 1/32, # for text, cutting error
+	NAME_HEIGHT    => 0 + 7/32,
+	ADDRESS_HEIGHT => 0 + 4/32,
+	AGE_HEIGHT     => 0 + 7/32,
+
+	# back
+	BACK_MARGIN    => 2 / 32,    # larger due to random alignment error
+	BARCODE_WIDTH  => 1 + 16/32,
+	BARCODE_HEIGHT => 0 + 10/32,
+	BARCODE_TB_SP  => 0 + 1/32,
+	BARCODE_QUIET  => 0 + 5/32, # at least 7 times bar size and 4mm
+	BCTEXT_HEIGHT  => 0 + 4/32,
+};
+
 sub _plot_one_pass_front {
 	my ($self, $cr, $pass, $passholder) = @_;
 	$cr->save;
-	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
-
-	# photo
-	$cr->save;
-	$cr->scale(1.125/4, 1.125/4);
-	$self->_plot_passholder_jpeg($cr, $passholder); 
-	$cr->restore;
-
-	# age box
-	$cr->set_source_rgb($passholder->age_group->age_group_color->as_list);
-	$cr->rectangle(0, 1.75, 3.5, .25);
-	$cr->fill;
-	$cr->set_source_rgb(0, 0, 0);
-	$self->_plot_text($cr,
-		{
-			text => $passholder->age_group->age_group_name,
-			rect => [0, 1.75, 3.5, 2],
-			font => 'DejaVu Sans Bold 10',
-			align => 'center',
-			valign => 'middle',
-		});
 
 	# name
+	my $name_right = $self->pass_width - FRONT_MARGIN;
+	my $name_bottom = FRONT_MARGIN + NAME_HEIGHT;
 	$cr->set_source_rgb(0, 0, 0);
 	$self->_plot_text($cr,
 		{
-			text => $passholder->holder_name,
-			rect => [15/16, 1/32, 3.375, 17/32],
-			font => 'DejaVu Serif Bold 13',
+			text  => $passholder->holder_name,
+			rect  => [FRONT_MARGIN, FRONT_MARGIN, $name_right, $name_bottom],
+			font  => 'DejaVu Serif Bold 12',
+			align => 'center'
+		});
+
+	# photo
+	my $photo_top = $name_bottom + PHOTO_SPACING;
+	my $photo_right = PHOTO_HEIGHT * 3 / 4;
+	my $photo_bottom = $photo_top + PHOTO_HEIGHT;
+	$cr->save;
+	$cr->translate(0, $photo_top);
+	$cr->scale(PHOTO_HEIGHT/4, PHOTO_HEIGHT/4);
+	$self->_plot_passholder_jpeg($cr, $passholder);
+	$cr->restore;
+
+	# notes
+	my $notes_left = $photo_right + PHOTO_SPACING;
+	my $notes_right = $self->pass_width - FRONT_MARGIN;
+	$self->_plot_text($cr,
+		{
+			text => $passholder->holder_notes,
+			rect => [$notes_left, $photo_top, $notes_right, $photo_bottom],
+			font => 'DejaVu Serif 8',
+			justify => 1,
 		});
 
 	# address
+	my $address_top = $photo_bottom + PHOTO_SPACING;
+	my $address_bottom = $address_top + ADDRESS_HEIGHT;
+	my $address_right = $self->pass_width - FRONT_MARGIN;
 	my $addr = $passholder->family->unit->house_number
 	         . ' '
 	         . $passholder->family->unit->street->street_name;
 	$self->_plot_text($cr,
 		{
 			text => $addr,
-			rect => [2*0.15+_BARCODE_WIDTH, 1.275, 3.375, 1.645],
-			font => 'DejaVu Serif Bold 8',
+			rect => [FRONT_MARGIN, $address_top, $address_right, $address_bottom],
+			font => 'DejaVu Serif Bold 7',
 			align => 'right',
+		});
+
+	# age box
+	my $age_top = $self->pass_height - AGE_HEIGHT;
+	$cr->set_source_rgb($passholder->age_group->age_group_color->as_list);
+	$cr->rectangle(0, $age_top, $self->pass_width, AGE_HEIGHT);
+	$cr->fill;
+	$cr->set_source_rgb(0, 0, 0);
+	$self->_plot_text($cr,
+		{
+			text => $passholder->age_group->age_group_name,
+			rect => [0, $age_top, $self->pass_width, $self->pass_height],
+			font => 'DejaVu Sans Bold 9',
+			align => 'center',
 			valign => 'middle',
 		});
 
-	# notes 
-	$self->_plot_text($cr,
-		{
-			text => $passholder->holder_notes,
-			rect => [1.05, 17/32, 3.375, 1.275],
-			font => 'DejaVu Serif 8',
-			justify => 1,
-		});
-
-	# bar code
-	$cr->save;
-	$cr->translate(0.15, 1.275);
-	$cr->scale(_BARCODE_WIDTH, 0.370);
-	$self->_plot_barcode($cr, $pass->pass_num);
-	$cr->restore;
-
-	$self->_plot_text($cr, 
-		{
-			text => _add_spaces($pass->pass_num),
-			rect => [0.15, 1.4+0.25, 0.15+_BARCODE_WIDTH, 1.75],
-			font => 'DejaVu Serif 7',
-			align => 'center',
-		});
 
 	# crop marks
 	$self->_plot_cropmarks($cr);
@@ -400,30 +419,32 @@ sub _plot_one_pass_front {
 	$cr->restore;
 }
 
-sub _escape {
-	# trivial and simple, surprised Catalyst doesn't provide...
-	my $s = shift;
-
-	$s =~ s/&/&amp;/g;
-	$s =~ s/</&lt;/g;
-	$s =~ s/>/&gt;/g;
-
-	return $s;
-}
-
-sub _nobreak {
-	# convert space to nonbreak
-	my $s = shift;
-
-	$s =~ y/ /\N{NO-BREAK SPACE}/;
-
-	return $s;
-}
-
 sub _plot_one_pass_back {
 	my ($self, $cr, $pass, $passholder) = @_;
 	$cr->save;
-	$cr->scale($self->pass_width / 3.5, $self->pass_height / 2);
+
+	# bar code text
+	my $bctext_left = BACK_MARGIN + BARCODE_QUIET;
+	my $bctext_right = $bctext_left + BARCODE_WIDTH;
+	my $bctext_bottom = $self->pass_height - BACK_MARGIN;
+	my $bctext_top = $bctext_bottom - BCTEXT_HEIGHT;
+	$self->_plot_text($cr, 
+		{
+			text => _add_spaces($pass->pass_num),
+			rect => [$bctext_left, $bctext_top, $bctext_right, $bctext_bottom],
+			font => 'DejaVu Serif 7',
+			align => 'center',
+		});
+
+	# bar code
+	my $barcode_top = $bctext_top - BARCODE_TB_SP - BARCODE_HEIGHT;
+	$cr->save;
+	$cr->translate($bctext_left, $barcode_top);
+	$cr->scale(BARCODE_WIDTH, BARCODE_HEIGHT);
+	$self->_plot_barcode($cr, $pass->pass_num);
+	$cr->restore;
+
+
 
 	my @contacts = $passholder->family->search_related(
 		'contacts',
@@ -450,33 +471,56 @@ sub _plot_one_pass_back {
 
 	# TODO: issue date. See the fix-me in C/Admin.pm
 
-	# yes, these overlap, but the custom message is aligned to the
-	# bottom. Going to hope they never cross :-D
-	my $box = [2/32, 2/32, 3.5-2/32, 2-2/32];
+	# contacts
+	my $contacts_right = $self->pass_width - BACK_MARGIN;
+	my $contacts_bottom = $barcode_top - BARCODE_TB_SP;
 	$self->_plot_text($cr,
 		{
 			markup => $markup,
-			rect => $box,
+			rect => [BACK_MARGIN, BACK_MARGIN, $contacts_right, $contacts_bottom],
 			font => 'DejaVu Serif 8',
 			justify => 0,
 			singlepar => 0,
 		});
 
+	# custom message
+	my $custom_left = $bctext_right + BARCODE_QUIET;
+	my $custom_top = $contacts_bottom;
+	my $custom_bottom = $self->pass_height - BACK_MARGIN;
 	pp $self->custom_message;
 	'' ne $self->custom_message and $self->_plot_text($cr,
 		{
 			markup => $self->custom_message,
-			rect => $box,
+			rect => [$custom_left, $custom_top, $contacts_right, $custom_bottom],
 			font => 'DejaVu Serif 8',
 			justify => 1,
 			singlepar => 0,
-			valign => 'bottom',
 		});
 	
 	# crop marks
 	$self->_plot_cropmarks($cr);
 
 	$cr->restore;
+}
+
+sub _escape {
+	# trivial and simple, surprised Catalyst doesn't provide...
+	my $s = shift;
+
+	$s =~ s/&/&amp;/g;
+	$s =~ s/</&lt;/g;
+	$s =~ s/>/&gt;/g;
+
+	return $s;
+}
+
+sub _nobreak {
+	# convert space to nonbreak
+	my $s = shift;
+
+	$s =~ y/ /\N{NO-BREAK SPACE}/;
+
+	return $s;
 }
 
 sub _plot_cropmarks {
@@ -488,17 +532,17 @@ sub _plot_cropmarks {
 	$cr->rel_line_to(0, -$self->crop_mark_size);
 	$cr->move_to(0, 0);
 	$cr->rel_line_to(-$self->crop_mark_size, 0);
-	$cr->move_to(3.5, 0);    # top-right
+	$cr->move_to($self->pass_width, 0);    # top-right
 	$cr->rel_line_to(0, -$self->crop_mark_size);
-	$cr->move_to(3.5, 0);
+	$cr->move_to($self->pass_width, 0);
 	$cr->rel_line_to($self->crop_mark_size, 0);
-	$cr->move_to(0, 2);      # bot-left
+	$cr->move_to(0, $self->pass_height);      # bot-left
 	$cr->rel_line_to(0, $self->crop_mark_size);
-	$cr->move_to(0, 2);
+	$cr->move_to(0, $self->pass_height);
 	$cr->rel_line_to(-$self->crop_mark_size, 0);
-	$cr->move_to(3.5, 2);    # bot-right
+	$cr->move_to($self->pass_width, $self->pass_height);    # bot-right
 	$cr->rel_line_to(0, $self->crop_mark_size);
-	$cr->move_to(3.5, 2);
+	$cr->move_to($self->pass_width, $self->pass_height);
 	$cr->rel_line_to($self->crop_mark_size, 0);
 	$cr->set_line_width(1 / 8 / 72);
 	$cr->stroke;
@@ -536,7 +580,6 @@ sub _plot_barcode {
 	my $num = sprintf('%010i', $num_raw);
 	my $code = $self->_barcode->barcode($num);
 	my $code_len = length($code);
-
 
 	$cr->save;
 	$cr->scale(1/$code_len, 1);
