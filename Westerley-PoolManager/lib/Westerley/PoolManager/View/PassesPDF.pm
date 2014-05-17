@@ -7,7 +7,7 @@ use Cairo;
 use Gtk2;
 use Data::Dump qw(pp);
 use File::Temp;
-use List::Util qw(max);
+use List::Util qw(max min);
 use List::MoreUtils qw(natatime);
 use Carp;
 use Barcode::Code128;
@@ -154,6 +154,12 @@ has rows => (
 	isa     => 'Int',
 	lazy    => 1,
 	builder => '_build_rows',
+);
+
+has debug_boxes => (
+	is      => 'ro',
+	isa     => 'Bool',
+	default => 0,
 );
 
 has _barcode => (
@@ -505,11 +511,32 @@ sub _add_spaces {
 	return $s;
 }
 
+sub _draw_debug_box {
+	my ($self, $cr, $rx, $ry, $rw, $rh) = @_;
+	return unless $self->debug_boxes;
+
+	$cr->save;
+
+	my ($x1, $y1) = $cr->device_to_user(0, 0);
+	my ($x2, $y2) = $cr->device_to_user(1, 1);
+	my $w = min(abs($x2 - $x1), abs($y2 - $y1));
+
+	$cr->set_source_rgba(0.5, 0.5, 0.5, 0.5);
+	$cr->set_line_width($w);
+	#$cr->set_dash([5*$w], 1, 0); # did not work...
+	$cr->rectangle($rx, $ry, $rw, $rh);
+	$cr->stroke;
+	$cr->restore;
+
+	return;
+}
+
 sub _plot_barcode {
 	my ($self, $cr, $num_raw) = @_;
 	my $num = sprintf('%010i', $num_raw);
 	my $code = $self->_barcode->barcode($num);
 	my $code_len = length($code);
+
 
 	$cr->save;
 	$cr->scale(1/$code_len, 1);
@@ -522,8 +549,9 @@ sub _plot_barcode {
 		}
 		$cr->fill;
 	}
+	$cr->restore;
 
-	$cr->restore
+	$self->_draw_debug_box($cr, 0, 0, 1, 1);
 }
 
 sub _plot_text {
@@ -595,8 +623,14 @@ sub _plot_text {
 
 	Pango::Cairo::show_layout($cr, $layout);
 
-
 	$cr->restore;
+
+	$self->_draw_debug_box(
+		$cr,
+		$opts->{rect}[0],
+		$opts->{rect}[1],
+		$opts->{rect}[2] - $opts->{rect}[0],
+		$opts->{rect}[3] - $opts->{rect}[1]);
 }
 
 # plot image inside a 3:4 rectangle at 0,0
@@ -619,6 +653,8 @@ sub _plot_passholder_jpeg {
 
 	$cr->rectangle(0, 0, 3, 4);
 	$cr->fill;
+
+	$self->_draw_debug_box($cr, 0, 0, 3, 4);
 
 	$cr->restore;
 
