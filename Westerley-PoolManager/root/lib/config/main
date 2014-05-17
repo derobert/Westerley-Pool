@@ -12,7 +12,7 @@
 
    # define a data structure to hold sitewide data
    site = {
-     title     => 'Pool Manager',
+     title     => 'Westerley Pool Manager',
      copyright => '2014 Anthony DeRobertis',
    };
 
