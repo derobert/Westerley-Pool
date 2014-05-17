@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use v5.18;
+
+use DBI;
+use Text::CSV;
+use Memoize;
+memoize 'get_street_ref';
+
+my $DBH;
+
+1 == @ARGV
+	or die "Usage: $0 unit-csv-file.csv";
+exit go();
+
+sub go {
+	$DBH = DBI->connect('dbi:Pg:dbname=westerley', '', '', {
+		RaiseError => 1,
+	}) or die "db connect...";
+
+	my $csv = Text::CSV->new
+		or die "Couldn't make CSV parser.";
+
+	open my $fh, '<:encoding(utf8)', $ARGV[0]
+		or die "open $ARGV[0]: $!";
+
+	$DBH->begin_work;
+	my $sth = $DBH->prepare(<<QUERY);
+INSERT INTO units (house_number, street_ref, unit_num) VALUES (?, ?, ?)
+QUERY
+	while (my $row = $csv->getline($fh)) {
+		3 == @$row or die
+			"Expected all rows to have 3 columns: house number, street name or alias, unit number";
+
+		$sth->execute($row->[0], get_street_ref($row->[1]), $row->[2]);
+	}
+	$DBH->commit;
+
+	return 0;
+}
+
+sub get_street_ref {
+	my $name = shift;
+
+	my $sth = $DBH->prepare_cached(<<QUERY);
+SELECT street_ref
+  FROM (
+      SELECT street_name, street_ref FROM streets
+    UNION ALL
+      SELECT street_alias, street_ref from street_aliases
+  ) all_streets WHERE street_name = ?
+QUERY
+	$sth->execute($name);
+	my ($ref) = $sth->fetchrow_array
+		or die "No such street: $name";
+	$sth->finish;
+
+	return $ref;
+}
