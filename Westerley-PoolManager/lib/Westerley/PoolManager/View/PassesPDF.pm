@@ -121,6 +121,20 @@ has custom_message => (
 	default => '',
 );
 
+has print_command => (
+	is      => 'ro',
+	isa     => 'HashRef',
+	default => sub { { command => 'gv' , arg => [], } },
+	trigger => sub {
+		my ($self, $new, undef) = @_;
+		$new->{arg} //= [];
+		ref($new->{arg})
+			or $new->{arg} = [ $new->{arg} ];
+		'' ne $new->{command}
+			or die "No command";
+	},
+);
+
 has crop_mark_size => (
 	# note! scaled by the pass size. In inches at default 3.5×2" size.
 	is      => 'ro',
@@ -296,9 +310,9 @@ sub process {
 	$cr = undef;
 	$surface = undef;
 
-	# DEBUG: show instead of print
-	# system { 'gv' } 'gv', $temp;
-	system { 'lpr' } 'lpr', qw(-P Officejet_Pro_L7600_HPSetup -o OutputMode=Best -o Duplex=DuplexNoTumble), $temp;
+	0 == system {$self->print_command->{command}}
+		$self->print_command->{command}, @{$self->print_command->{arg}}, $temp
+		or die "print: system: $!";
 
 	$c->stash->{pdffile} = $temp;
 }
