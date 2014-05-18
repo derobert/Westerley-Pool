@@ -3,6 +3,9 @@ Description=Westerley Pool Manager web app via starman
 Requires=postgresql.service
 After=postgresql.service
 
+[Install]
+WantedBy=multi-user.target
+
 [Service]
 # would do simple, but Starman doesn't do socket activation AFAIK
 Type=forking
