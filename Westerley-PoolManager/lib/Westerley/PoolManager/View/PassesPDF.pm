@@ -306,9 +306,7 @@ sub process {
 
 				if (++$col >= $self->columns) {
 					$col = 0;
-					if (++$row >= $self->rows) {
-						die "handle page 2";
-					}
+					++$row;
 				}
 			}
 			
