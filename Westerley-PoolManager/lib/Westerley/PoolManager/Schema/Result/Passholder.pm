@@ -191,6 +191,19 @@ __PACKAGE__->belongs_to(
 		};
 	}
 );
+
+__PACKAGE__->has_many(
+	"valid_passes",
+	"Westerley::PoolManager::Schema::Result::Pass",
+	sub {
+		my $args = shift;
+		return {
+			"$args->{foreign_alias}.passholder_num" => { -ident => "$args->{self_alias}.passholder_num" },
+			"$args->{foreign_alias}.pass_valid" => 1,
+		};
+	},
+	{ cascade_copy => 0, cascade_delete => 0 },
+);
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
