@@ -19,9 +19,9 @@ sub search_issuable {
 	$extra //= {};
 
 	$self->schema->resultset('Passholder')->search({
-			'passes.pass_num' => undef,
+			'valid_passes.pass_num' => undef,
 			'me.holder_photo' => {'!=', undef},
-		}, {join => 'passes', %$extra});
+		}, {join => 'valid_passes', %$extra});
 }
 
 =head1 NAME
