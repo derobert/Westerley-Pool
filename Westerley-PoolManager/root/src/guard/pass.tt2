@@ -50,7 +50,7 @@
 </tr>
 </table>
     [% IF ! pass.allow_admission %]
-<h1>Do not admit</h1>
+[% site.messages.no_admit %]
     [% END %]
   [% ELSE %]
 <h1>Not a member</h1>
