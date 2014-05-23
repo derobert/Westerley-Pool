@@ -1,4 +1,5 @@
-﻿[% IF pass %]
+﻿[% PROCESS 'guard/inc_wand.tt2' -%]
+[% IF pass %]
   [% IF pass.passholder %]
 <span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
 
@@ -49,7 +50,7 @@
 </tr>
 </table>
     [% IF ! pass.allow_admission %]
-<h1>Do not admit</h1>
+[% site.messages.no_admit %]
     [% END %]
   [% ELSE %]
 <h1>Not a member</h1>

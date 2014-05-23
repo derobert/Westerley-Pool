@@ -18,7 +18,8 @@
 
    # load up any other configuration items
    PROCESS config/col
-         + config/layout;
+         + config/layout
+         + config/messages;
 
    # set defaults for variables, etc.
    DEFAULT

@@ -1,0 +1,5 @@
+[%
+	site.messages = {
+		no_admit = '<h1>Do not admit</h1>'
+	}
+%]
