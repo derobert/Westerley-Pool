@@ -1,0 +1,33 @@
+﻿<script type="text/javascript">
+var wand_in_barcode_scanout = false;
+var wand_buffer = '';
+
+// keypress only works in Firefox for F2.
+function wand_keydown( ev ) {
+    if (113 == ev.keyCode) {
+        wand_buffer = '';
+        wand_in_barcode_scanout = true;
+    }
+}
+
+function wand_keypress( ev ) {
+    if (!wand_in_barcode_scanout) {
+        return true;
+    } else if (13 == ev.charCode || 13 == ev.keyCode) {
+        wand_in_barcode_scanout = false;
+        window.location.href = '[% C.uri_for('/guard/pass') %]' +
+                               '/' + wand_buffer;
+    } else if (113 == ev.keyCode) {
+        // ignore, keydown does this
+    } else {
+        wand_buffer += String.fromCharCode(ev.charCode);
+    }
+
+    ev.preventDefault();
+
+    return true;
+}
+
+$(document).on('keydown', wand_keydown)
+$(document).on('keypress', wand_keypress)
+</script>

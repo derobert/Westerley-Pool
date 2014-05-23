@@ -1,4 +1,5 @@
-﻿[% IF pass %]
+﻿[% PROCESS 'guard/inc_wand.tt2' -%]
+[% IF pass %]
   [% IF pass.passholder %]
 <span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
 
