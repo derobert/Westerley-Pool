@@ -52,7 +52,19 @@ Attempt to render a view, if needed.
 
 =cut
 
-sub end : ActionClass('RenderView') {}
+sub end : ActionClass('RenderView') {
+	my ($self, $c) = @_;
+
+	my $cache_time = $c->stash->{cache_time} // 0;
+	if ($cache_time > 0) {
+		$c->response->headers->expires(time + $cache_time);
+		$c->response->headers->header(
+			cache_control => "public, max-age=$cache_time");
+	} else {
+		$c->response->headers->header(pragma        => 'no-cache');
+		$c->response->headers->header(cache_control => 'no-cache');
+	}
+}
 
 =head1 AUTHOR
 
