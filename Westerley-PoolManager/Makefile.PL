@@ -30,6 +30,8 @@ requires 'Pango';
 requires 'Gtk2';
 requires 'Barcode::Code128';
 
+requires 'Crypt::Eksblowfish::Bcrypt';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
