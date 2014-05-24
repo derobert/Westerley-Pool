@@ -25,7 +25,9 @@ sub login : Local Args(0) {
 
 	if ('login' eq $op) {
 		if ($c->authenticate({ user_name => $username, password => $password })) {
+			$c->flash(login_ok => 1);
 			$c->response->redirect($c->uri_for('/'));
+			$c->detach;
 		} else {
 			$c->stash(bad_credentials => 1);
 		}
@@ -36,6 +38,9 @@ sub logout : Local Args(0) {
 	my ($self, $c) = @_;
 
 	$c->logout();
+	$c->flash(logout_ok => 1);
+	$c->response->redirect($c->uri_for('/'));
+	$c->detach;
 }
 
 
