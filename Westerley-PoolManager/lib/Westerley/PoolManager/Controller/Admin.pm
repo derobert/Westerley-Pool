@@ -24,6 +24,18 @@ Catalyst Controller.
 
 =cut
 
+sub auto : Private {
+	my ($self, $c) = @_;
+
+	if (! $c->user_exists) {
+		$c->log->info("No logged in user in admin");
+		$c->response->redirect($c->uri_for('/user/login'));
+		$c->detach;
+	}
+
+	$c->assert_user_roles( qw/admin/ );
+}
+
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
