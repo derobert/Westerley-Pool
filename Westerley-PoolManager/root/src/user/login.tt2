@@ -1,0 +1,13 @@
+﻿<h1>I can haz credentials?</h1>
+[%- IF bad_credentials %]
+<strong>Invalid username or password.</strong>
+[%- END %]
+<form method="post">
+  <label for="username">Username:</label>
+  <input type="text" name="username" id="username"><br>
+
+  <label for="password">Password:</label>
+  <input type="password" name="password" id="password"><br>
+
+  <button name="op" value="login">Login</button>
+</form>

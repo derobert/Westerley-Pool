@@ -105,3 +105,26 @@ CREATE TABLE contact_phones (
 	phone_label    VARCHAR(20) NOT NULL,
 	PRIMARY KEY (contact_num, phone_number)
 );
+
+CREATE TABLE users (
+	user_num      SERIAL PRIMARY KEY,
+	user_name     VARCHAR(50) UNIQUE,
+	user_pwhash   VARCHAR(200) NOT NULL,
+	user_active   BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE TABLE roles (
+	role_num      SERIAL PRIMARY KEY, -- silly, but consistent
+	role_name     VARCHAR(50) UNIQUE,
+	role_descr    TEXT NOT NULL
+);
+
+INSERT INTO roles (role_name, role_descr) VALUES
+	( 'admin', 'Access the administrative interface' )
+	;
+
+CREATE TABLE user_roles (
+	user_num      INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+	role_num      INTEGER NOT NULL REFERENCES roles ON DELETE CASCADE,
+	PRIMARY KEY(user_num, role_num)
+);
