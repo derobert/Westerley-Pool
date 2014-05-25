@@ -1,3 +1,6 @@
 #!/bin/sh
+set -x
 
 ./script/westerley_poolmanager_create.pl model Pool DBIC::Schema Westerley::PoolManager::Schema create=static naming=v8 use_moose=1 dbi:Pg:dbname=westerley '' '' AutoCommit=1
+
+rm -f lib/Westerley/PoolManager/Model/Pool.pm.new
