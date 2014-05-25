@@ -1,4 +1,5 @@
 ﻿[% PROCESS 'guard/inc_wand.tt2' %]
 <h1>Guard Interface</h1>
+<a href="[% C.uri_for('/guard/today') %]">Visitors today</a>
 
 [% PROCESS 'guard/inc_searchforms.tt2' %]

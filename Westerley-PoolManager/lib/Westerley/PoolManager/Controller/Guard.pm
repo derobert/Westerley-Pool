@@ -61,6 +61,19 @@ sub pass :Local :Args(1) {
 	}
 }
 
+sub today : Local Args(0) {
+	my ($self, $c) = @_;
+
+	$c->stash->{checkin} = [
+		$c->model('Pool::Log')->search({
+				log_type => 'checkin',
+				log_time => {'>=', \q{DATE_TRUNC('day', CURRENT_TIMESTAMP)}}})];
+	$c->stash->{scanned} = [
+		$c->model('Pool::Log')->search({
+				log_type => 'view',
+				log_time => {'>=', \q{DATE_TRUNC('day', CURRENT_TIMESTAMP)}}})];
+}
+
 
 =encoding utf8
 

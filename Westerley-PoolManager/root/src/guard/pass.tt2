@@ -76,3 +76,5 @@ confirm the number was entered or scanned correctly.
 <h2>Search Again</h2>
 [% PROCESS 'guard/inc_searchforms.tt2' %]
 [% END %]
+
+<a href="[% C.uri_for('/guard') %]">Menu</a>

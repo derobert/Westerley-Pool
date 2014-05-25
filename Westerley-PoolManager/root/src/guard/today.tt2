@@ -1,0 +1,44 @@
+﻿[% PROCESS 'guard/inc_wand.tt2' -%]
+<style type="text/css">
+  table { border-collapse: collapse; }
+  td, th { padding-left: 1.5em; padding-top: .25em; padding-bottom: .25em; }
+  tr:nth-child(even) { background: rgb(255,255,220); }
+  tr:nth-child(odd) { background: rgb(220,220,255); }
+</style>
+<h1>Checked in Today</h1>
+<table>
+  <tr>
+    <th>When</th>
+    <th>Pass #</th>
+    <th>Name</th>
+    <th>Address</th>
+  </tr>
+[%- FOR rec IN checkin %]
+  <tr>
+    <td>[% rec.log_time | html %]</td>
+    <td>[% rec.pass_num | html %]</td>
+    <td>[% rec.holder_name | html %]</td>
+    <td>[% rec.house_number | html %] [% rec.street_name | html %]</td>
+  </tr>
+[%- END %]
+</table>
+
+<h1>Passes Scanned Today</h1>
+<table>
+  <tr>
+    <th>When</th>
+    <th>Pass #</th>
+    <th>Name</th>
+    <th>Address</th>
+  </tr>
+[%- FOR rec IN scanned %]
+  <tr>
+    <td>[% rec.log_time | html %]</td>
+    <td>[% rec.pass_num | html %]</td>
+    <td>[% rec.holder_name | html %]</td>
+    <td>[% rec.house_number | html %] [% rec.street_name | html %]</td>
+  </tr>
+[%- END %]
+</table>
+
+<a href="[% C.uri_for('/guard') %]">Menu</a>
