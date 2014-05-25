@@ -34,6 +34,7 @@ sub index :Path :Args(0) {
 
 sub pass :Local :Args(1) {
 	my ($self, $c, $pass_no) = @_;
+	$c->stash->{pass_no} = $pass_no;
 
 	# FIXME: This winds up pulling the jpeg...
 	my $row = $c->model('Pool::Pass')->find($pass_no, {
@@ -42,15 +43,22 @@ sub pass :Local :Args(1) {
 			                age_group => undef },
 		},
 	});
-	if ($row) {
-		$c->model('Pool')->log_pass(view => $row);
-		$row->passholder and
-			$c->stash->{photo_uri} = $c->uri_for('/jpeg/view', $row->passholder->passholder_num);
-	} else {
+	if (!$row) {
 		$c->response->status(404);
+		$c->detach;
 	}
-	$c->stash->{pass_no} = $pass_no;
+
 	$c->stash->{pass} = $row;
+	$c->stash->{photo_uri} = $c->uri_for('/jpeg/view', $row->passholder->passholder_num)
+		if $row->passholder;
+
+	my $op = $c->req->params->{op} // '';
+	if ('checkin' eq $op) {
+		$c->model('Pool')->log_pass(checkin => $row);
+		$c->stash(checked_in => 1);
+	} else {
+		$c->model('Pool')->log_pass(view => $row);
+	}
 }
 
 

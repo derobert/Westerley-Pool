@@ -49,7 +49,15 @@
   </td>
 </tr>
 </table>
-    [% IF ! pass.allow_admission %]
+    [% IF pass.allow_admission %]
+      [% IF checked_in %]
+        <strong>Checked in.</strong>
+      [% ELSE %]
+<form method="post">
+   <button name="op" value="checkin">Check In</button>
+</form>
+      [% END %]
+    [% ELSE %]
 [% site.messages.no_admit %]
     [% END %]
   [% ELSE %]
