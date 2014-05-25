@@ -71,9 +71,6 @@ sub issue : Path('/pass/issue') Args(0) {
 
 	if ('list' eq $op) {
 		$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable({order_by => 'me.holder_name' });
-		#$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
-		#	->search( { 'passes.pass_num' => undef },
-		#		{ join => 'passes', );
 		$c->detach;
 	} elsif ('issue' eq $op || 'print' eq $op) { 
 		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
@@ -85,27 +82,28 @@ sub issue : Path('/pass/issue') Args(0) {
 		die "Invalid op: $op";
 	}
 
-	# issue passes
-	my @passes;
-	if ('issue' eq $op) {
-		foreach my $phnum ($c->req->params->get_all('which')) {
-			my $pnum = int rand 2**31;
-			push @passes, $c->model('Pool::Pass')->create({
-					passholder_num => $phnum,
-					pass_num => $pnum,
-			});
-			# FIXME: Reload from DB to get the issue date.
-			$c->log->info("Created pass for $phnum: pass $pnum");
+	$c->model('Pool')->txn_do(sub {
+		# issue passes
+		my @passes;
+		if ('issue' eq $op) {
+			foreach my $phnum ($c->req->params->get_all('which')) {
+				my $pnum = int rand 2**31;
+				push @passes, $c->model('Pool::Pass')->create({
+						passholder_num => $phnum,
+						pass_num => $pnum,
+				});
+				# FIXME: Reload from DB to get the issue date.
+				$c->log->info("Created pass for $phnum: pass $pnum");
+			}
+		} elsif ('print' eq $op) {
+			die "Load passes to reprint from db";
 		}
-	} elsif ('print' eq $op) {
-		die "Load passes to reprint from db";
-	}
 
-	# print passes
-	$c->stash->{passes} = \@passes;
-	$c->forward('View::PassesPDF');
-	
-
+		# print passes
+		$c->stash->{passes} = \@passes;
+		$c->forward('View::PassesPDF');
+		die join "\n", @{ $c->error } if @{ $c->error };
+	});
 }
 
 sub show_unit :Path('/unit') Args(1) {
