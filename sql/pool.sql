@@ -129,7 +129,7 @@ CREATE TABLE user_roles (
 	PRIMARY KEY(user_num, role_num)
 );
 
-CREATE TABLE UNLOGGED sessions (
+CREATE UNLOGGED TABLE sessions (
 	session_id        CHAR(72) PRIMARY KEY,
 	session_data      TEXT,
 	session_expires   INTEGER
