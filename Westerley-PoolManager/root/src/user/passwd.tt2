@@ -1,0 +1,27 @@
+﻿[%- IF weak_pw %]
+<strong>Your new password is too weak. Please try again. Password
+unchanged.</strong>
+[%- END %]
+[%- IF did_not_match %]
+<strong>"re-enter" did not match. Try again. Password
+unchanged.</strong>
+[%- END %]
+[%- IF bad_pw %]
+<strong>The currennt password is not correct. Password
+unchanged.</strong>
+[%- END %]
+<form method="post">
+  <label for="current">Current Password:</label>
+  <input type="password" name="current" id="current"><br>
+
+  <label for="new">New Password:</label>
+  <input type="password" name="new" id="new"><br>
+
+  <label for="repeat">Re-Enter New Password:</label>
+  <input type="password" name="repeat" id="repeat"><br>
+
+  <button name="op" value="change">Change Password</button>
+</form>
+
+<em>Note: Changing your password will take a few seconds due to password
+hashing. Please be patient.</em>

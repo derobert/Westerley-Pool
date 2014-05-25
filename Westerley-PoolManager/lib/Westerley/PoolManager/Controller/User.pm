@@ -34,6 +34,38 @@ sub login : Local Args(0) {
 	}
 }
 
+sub passwd : Local Args(0) {
+	my ($self, $c) = @_;
+
+	my $user = $c->user;
+	if (!$user) {
+		$c->res->redirect($c->uri_for_action('/user/passwd'));
+		$c->detach;
+	}
+
+	my $current_password = $c->req->params->{current} // '';
+	my $new_password = $c->req->params->{new} // '';
+	my $repeat_password = $c->req->params->{repeat} // '';
+	my $op = $c->req->params->{op} // '';
+
+	if ('change' eq $op) {
+		if ($new_password eq '') {
+			$c->stash(weak_pw => 1);
+		} elsif ($new_password ne $repeat_password) {
+			$c->stash(did_not_match => 1);
+			$c->detach;
+		} elsif (! $user->check_password($current_password)) {
+			$c->stash(bad_pw => 1);
+			$c->detach;
+		} else {
+			$user->set_password($new_password);
+			$user->update;
+			$c->flash(changed_pw => 1);
+			$c->res->redirect($c->uri_for('/'));
+		}
+	}
+}
+
 sub logout : Local Args(0) {
 	my ($self, $c) = @_;
 
