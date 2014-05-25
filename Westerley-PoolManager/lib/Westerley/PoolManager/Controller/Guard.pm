@@ -43,6 +43,7 @@ sub pass :Local :Args(1) {
 		},
 	});
 	if ($row) {
+		$c->model('Pool')->log_pass(view => $row);
 		$row->passholder and
 			$c->stash->{photo_uri} = $c->uri_for('/jpeg/view', $row->passholder->passholder_num);
 	} else {

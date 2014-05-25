@@ -134,3 +134,20 @@ CREATE UNLOGGED TABLE sessions (
 	session_data      TEXT,
 	session_expires   INTEGER
 );
+
+CREATE TYPE log_entry_type AS ENUM (
+	'view',     -- pass viewed (e.g., scanned with barcode scanner)
+	'checkin',  -- guard pressed checkin button
+	'checkout'  -- guard pressed checkout button (future)
+);
+
+CREATE TABLE log (
+	log_num        SERIAL PRIMARY KEY,
+	log_time       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	log_type       LOG_ENTRY_TYPE NOT NULL,
+	pass_num       INTEGER NOT NULL REFERENCES passes ON DELETE NO ACTION,
+	holder_name    VARCHAR(100) NOT NULL DEFAULT 'N/A',
+	family_name    VARCHAR(30) NOT NULL DEFAULT 'N/A',
+	house_number   INTEGER NOT NULL DEFAULT -1,
+	street_name    VARCHAR(100) NOT NULL DEFAULT 'N/A'
+);
