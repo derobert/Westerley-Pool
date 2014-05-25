@@ -128,3 +128,9 @@ CREATE TABLE user_roles (
 	role_num      INTEGER NOT NULL REFERENCES roles ON DELETE CASCADE,
 	PRIMARY KEY(user_num, role_num)
 );
+
+CREATE TABLE UNLOGGED sessions (
+	session_id        CHAR(72) PRIMARY KEY,
+	session_data      TEXT,
+	session_expires   INTEGER
+);
