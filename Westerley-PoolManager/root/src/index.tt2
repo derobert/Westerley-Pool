@@ -5,10 +5,14 @@
 [%- IF C.flash.logout_ok %]
 <strong>Logged out successfully.</strong>
 [%- END %]
+[%- IF C.flash.changed_pw %]
+<strong>Password changed.</strong>
+[%- END %]
 <ul>
   <li><a href="[% C.uri_for('/guard') %]">Guard Interface</a></li>
 [%- IF C.user_exists %]
   <li><a href="[% C.uri_for('/admin') %]">Admin Interface</a></li>
+  <li><a href="[% C.uri_for('/user/passwd') %]">Change Password</a></li>
   <li><a href="[% C.uri_for('/user/logout') %]">Log out</a></li>
 [%- ELSE %]
   <li><a href="[% C.uri_for('/user/login') %]">Log in</a></li>

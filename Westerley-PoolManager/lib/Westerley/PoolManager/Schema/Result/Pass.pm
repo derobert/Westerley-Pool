@@ -94,6 +94,21 @@ __PACKAGE__->set_primary_key("pass_num");
 
 =head1 RELATIONS
 
+=head2 logs
+
+Type: has_many
+
+Related object: L<Westerley::PoolManager::Schema::Result::Log>
+
+=cut
+
+__PACKAGE__->has_many(
+  "logs",
+  "Westerley::PoolManager::Schema::Result::Log",
+  { "foreign.pass_num" => "self.pass_num" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 passholder
 
 Type: belongs_to
@@ -115,8 +130,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-04-11 02:19:03
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6Sh8sXdnaeNzxLkn3TAyBg
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-05-25 13:04:57
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:efGffztpgcJZq6fQS86rwA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

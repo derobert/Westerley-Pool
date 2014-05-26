@@ -16,6 +16,7 @@ packages:
 	libcatalyst-devel-perl libcatalyst-modules-perl
 	libdbix-class-helpers-perl libdbd-pg-perl libdatetime-format-pg-perl
 	libcairo-perl libpango-perl libgtk2-perl libbarcode-code128-perl
+	libcrypt-eksblowfish-perl libbytes-random-secure-perl
 
 Note that `libcatalyst-devel-perl` probably is not required, except for
 the double-check step (Makefile.PL)
@@ -62,5 +63,7 @@ Note that sample.sql contains sample data, and you may not want to load
 it.
 
 Back as root, copy the `westerley-poolmanager.service` file to
-`/etc/systemd/system` and then use
-`systemctl start westerley-poolmanager.service` to start it.
+`/etc/systemd/system` and then:
+
+    systemctl enable westerley-poolmanager.service
+    systemctl start westerley-poolmanager.service

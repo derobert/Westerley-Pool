@@ -24,6 +24,26 @@ sub search_issuable {
 		}, {join => 'valid_passes', %$extra});
 }
 
+sub log_pass {
+	my ($self, $action, $pass) = @_;
+
+	my %attr = (
+		log_type => $action,
+		pass_num => $pass->pass_num,
+	);
+
+	if (my $ph = $pass->passholder) {
+		$attr{holder_name} = $ph->holder_name;
+		$attr{family_name} = $ph->family->family_name;
+		$attr{house_number} = $ph->family->unit->house_number;
+		$attr{street_name} = $ph->family->unit->street->street_name;
+	}
+
+	$self->schema->resultset('Log')->create(\%attr);
+
+	return;
+}
+
 =head1 NAME
 
 Westerley::PoolManager::Model::Pool - Catalyst DBIC Schema Model

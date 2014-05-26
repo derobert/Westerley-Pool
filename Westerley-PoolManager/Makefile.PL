@@ -31,6 +31,7 @@ requires 'Gtk2';
 requires 'Barcode::Code128';
 
 requires 'Crypt::Eksblowfish::Bcrypt';
+requires 'Bytes::Random::Secure';
 
 test_requires 'Test::More' => '0.88';
 catalyst;

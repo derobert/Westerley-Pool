@@ -26,7 +26,7 @@ use Catalyst qw/
 	Authorization::Roles
 
     Session
-    Session::Store::FastMmap
+    Session::Store::DBIC
     Session::State::Cookie
 /;
 
@@ -65,7 +65,13 @@ __PACKAGE__->config(
 				role_field    => 'role_name',
 			},
 		},
-	}
+	},
+	'Plugin::Session' => {
+		dbic_class    => 'Pool::Session',
+		id_field      => 'session_id',
+		data_field    => 'session_data',
+		expires_field => 'session_expires',
+	},
 );
 
 # Start the application
