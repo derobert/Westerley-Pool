@@ -63,13 +63,13 @@ has paper_margin_right => (
 has paper_margin_top => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 1,
+	default => 0.75,
 );
 
 has paper_margin_bottom => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 1,
+	default => 0.75,
 );
 
 has pass_width => (
@@ -87,13 +87,13 @@ has pass_height => (
 has pass_spacing_lr => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 0.125,
+	default => .03125,
 );
 
 has pass_spacing_tb => (
 	is      => 'ro',
 	isa     => 'Num',
-	default => 0.125,
+	default => .03125,
 );
 
 # when you're looking from the front (e.g., with light shining through),
@@ -136,10 +136,35 @@ has print_command => (
 );
 
 has crop_mark_size => (
-	# note! scaled by the pass size. In inches at default 3.5×2" size.
+	# note! scaled by the pass size. In inches at default 3¼×1⅞" size.
 	is      => 'ro',
 	isa     => 'Num',
 	default => 3/64,
+);
+
+has crop_marks => (
+	is      => 'ro',
+	isa     => 'Bool',
+	default => 0,
+);
+
+has cut_mark_size => (
+	# NOT scaled by pass size. In inches.
+	is      => 'ro',
+	isa     => 'Num',
+	default => 1/128,
+);
+
+has cut_marks => (
+	is      => 'ro',
+	isa     => 'Bool',
+	default => 1,
+);
+
+has cut_marks_back => (
+	is      => 'ro',
+	isa     => 'Bool',
+	default => 0
 );
 
 has columns => (
@@ -212,18 +237,16 @@ sub BUILD {
 	$self->rows > 0    or die "Must have a least one row";
 
 	# calculate used width
-	my $width = $self->paper_margin_left + $self->paper_margin_right;
-	$width += $self->columns * $self->pass_width;
-	$width += ($self->columns - 1) * $self->pass_spacing_lr;
+	my $width = $self->paper_margin_left + $self->paper_margin_right
+		+ $self->_pass_area_width;
 
 	# fp math is not exact, so allow a small fudge factor
 	die "Configuration exceeds the width of the page (need $width)"
 		if $self->paper_width + 0.01 < $width;
 
 	# and again for height
-	my $height = $self->paper_margin_top + $self->paper_margin_bottom;
-	$height += $self->rows * $self->pass_height;
-	$height += ($self->rows - 1) * $self->pass_spacing_tb;
+	my $height = $self->paper_margin_top + $self->paper_margin_bottom
+		+ $self->_pass_area_height;
 
 	die "Configuration exceeds the height of the page (need $height)"
 		if $self->paper_height + 0.01 < $height;
@@ -260,6 +283,7 @@ sub process {
 
 	my @sides = ({
 			plot => \&_plot_one_pass_front,
+			name => 'front',
 			xpos => sub {
 				$self->paper_margin_left 
 					+ $_[0] * ($self->pass_width + $self->pass_spacing_lr);
@@ -268,6 +292,7 @@ sub process {
 		},
 		{
 			plot => \&_plot_one_pass_back,
+			name => 'back',
 			xpos => sub {
 				# right margin eats the remaining width
 				$self->paper_width - $self->paper_margin_left
@@ -280,13 +305,12 @@ sub process {
 
 	while (my @this_page = $page_iter->()) {
 		foreach my $side (@sides) {
+			$self->_plot_cut_marks($cr, $side->{name});
 			my $col = 0;
 			my $row = 0;
 			foreach my $pass (@this_page) {
-				my $xpos = $side->{xpos}($col);
-				my $ypos = $self->paper_margin_top
-				         + $side->{yadj}
-						 + $row * ($self->pass_height + $self->pass_spacing_tb);
+				my ($xpos, $ypos)
+					= $self->_pass_position($side->{name}, $col, $row);
 
 				my $passholder = $pass->search_related('passholder', undef,
 					{
@@ -323,6 +347,127 @@ sub process {
 		or die "print: system: $!";
 
 	$c->stash->{pdffile} = $temp;
+}
+
+sub _plot_cut_marks {
+	my ($self, $cr, $side) = @_;
+	$cr->save;
+	$side eq 'front' || $self->cut_marks_back or return;
+	$self->cut_marks or return;
+
+	# do not draw lines inside the pass area, as they'd wind up on the
+	# passes.
+	$cr->set_fill_rule("even-odd");
+	$cr->rectangle(0, 0, $self->paper_width, $self->paper_height);
+	$cr->rectangle($self->_pass_area_topleft($side, 1),
+		$self->_pass_area_width(1), $self->_pass_area_height(1));
+	$cr->clip;
+	
+	# _pass_position is required to work for passes beyond the page
+	# boundaries. We thus happily pass it hypothetical pass positions
+	# (e.g., column -1, or one past the end) to find the location of the
+	# marks.
+
+	for (my $col = 0; $col <= $self->columns; ++$col) {
+		my ($x1, undef) = $self->_pass_position($side, $col - 1, 0);
+		my ($x2, undef) = $self->_pass_position($side, $col,     0);
+		$x1 += $self->pass_width;
+
+		my $x = ($x2 + $x1)/2;
+
+		$cr->move_to($x, 0);
+		$cr->line_to($x, $self->paper_height);
+	}
+
+	for (my $row = 0; $row <= $self->rows; ++$row) {
+		my (undef, $y1) = $self->_pass_position($side, 0, $row - 1);
+		my (undef, $y2) = $self->_pass_position($side, 0, $row);
+		$y1 += $self->pass_height;
+
+		my $y = ($y2 + $y1)/2;
+
+		$cr->move_to(0, $y);
+		$cr->line_to($self->paper_width, $y);
+	}
+
+	$cr->set_source_rgb(0, 0, 0);
+	$cr->set_line_width($self->cut_mark_size);
+	$cr->stroke;
+
+	$cr->restore;
+	return;
+}
+
+sub _pass_position {
+	# NOTE: This is required to work for hypothetical pass positions
+	# beyond the page boundaries on all sides.
+	
+	my ($self, $side, $col, $row) = @_;
+	wantarray or croak "_pass_position returns two values";
+
+	my $xpos;
+	my $yadj;
+	if ('front' eq $side) {
+		$xpos = $self->paper_margin_left
+			+ $col * ($self->pass_width + $self->pass_spacing_lr);
+		$yadj = 0;
+	} elsif ('back' eq $side) {
+		# right margin eats the remaining width
+		$xpos = $self->paper_width
+		      - $self->paper_margin_left
+		      + $self->reverse_side_left_shift
+		      - $self->pass_width
+		      - $col * ($self->pass_width + $self->pass_spacing_lr);
+
+		$yadj = -$self->reverse_side_up_shift;
+	} else {
+		croak "Unexpected side: $side";
+	}
+
+	return (
+		$xpos,
+		$self->paper_margin_top + $yadj + $row * ($self->pass_height + $self->pass_spacing_tb)
+	);
+}
+
+sub _pass_area_width {
+	my ($self, $expanded) = @_;
+	my $expansion = $expanded ? 2 * $self->pass_spacing_lr : 0;
+
+	return $self->columns * $self->pass_width
+		+ ($self->columns - 1) * $self->pass_spacing_lr
+		+ $expansion;
+}
+
+sub _pass_area_height {
+	my ($self, $expanded) = @_;
+	my $expansion = $expanded ? 2 * $self->pass_spacing_tb : 0;
+
+	return $self->rows * $self->pass_height
+		+ ($self->rows - 1) * $self->pass_spacing_tb
+		+ $expansion;
+}
+
+sub _pass_area_topleft {
+	my ($self, $side, $expanded) = @_;
+	wantarray or die "_pass_area_topleft returns 2 values";
+
+	my $col;
+	if ('front' eq $side) {
+		$col = 0;
+	} elsif ('back' eq $side) {
+		$col = $self->columns - 1;
+	} else {
+		croak "Silly side: $side";
+	}
+
+	my ($x, $y) = $self->_pass_position($side, $col, 0);
+	if ($expanded) {
+		$x -= $self->pass_spacing_lr;
+		$y -= $self->pass_spacing_tb;
+	};
+
+	return ($x, $y);
 }
 
 use constant {
@@ -523,6 +668,7 @@ sub _nobreak {
 
 sub _plot_cropmarks {
 	my ($self, $cr) = @_;
+	return unless $self->crop_marks;
 
 	$cr->save;
 	$cr->set_source_rgb(0, 0, 0);
