@@ -1,4 +1,7 @@
-﻿<h1>Main Menu</h2>
+﻿<style>
+  li { line-height: 2; }
+</style>
+<h1>Main Menu</h2>
 [%- IF C.flash.login_ok %]
 <strong>Login successful.</strong>
 [%- END %]
