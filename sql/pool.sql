@@ -121,6 +121,7 @@ CREATE TABLE roles (
 
 INSERT INTO roles (role_name, role_descr) VALUES
 	( 'admin', 'Access the administrative interface' )
+	( 'backup', 'Perform data backups' )
 	;
 
 CREATE TABLE user_roles (

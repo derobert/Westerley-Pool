@@ -1,0 +1,8 @@
+﻿<form method="post" action="[% C.uri_for('/backup/run') %]">
+  <button type="submit" name="op" value="go" style="margin: 1em">
+    Run Backup
+  </button>
+</form>
+
+<div style="padding-top: 2em;"></div>
+<a href="[% C.uri_for('/') %]">Main Menu</a>
