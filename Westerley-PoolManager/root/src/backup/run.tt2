@@ -1,0 +1,18 @@
+﻿[% UNLESS ok %]
+<strong>Something went wrong!</strong>
+[% END %]
+
+Backup complete.
+
+<table style="margin: 2em;">
+  <tr>
+    <th>Backup File</th>
+    <td><tt>[% file | html %]</tt></td>
+  </tr>
+  <tr>
+    <th>Backup Size</th>
+    <td>[% size | html %] bytes</td>
+  </tr>
+</table>
+
+<a href="[% C.uri_for('/') %]">Main Menu</a>

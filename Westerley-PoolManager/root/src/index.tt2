@@ -11,7 +11,12 @@
 <ul>
   <li><a href="[% C.uri_for('/guard') %]">Guard Interface</a></li>
 [%- IF C.user_exists %]
+  [%- IF C.check_user_roles('admin') %]
   <li><a href="[% C.uri_for('/admin') %]">Admin Interface</a></li>
+  [%- END %]
+  [%- IF C.check_user_roles('backup') %]
+  <li><a href="[% C.uri_for('/backup') %]">Backup Interface</a></li>
+  [%- END %]
   <li><a href="[% C.uri_for('/user/passwd') %]">Change Password</a></li>
   <li><a href="[% C.uri_for('/user/logout') %]">Log out</a></li>
 [%- ELSE %]

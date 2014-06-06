@@ -1,0 +1,5 @@
+﻿<form method="post" action="[% C.uri_for('/backup/run') %]">
+  <button type="submit" name="op" value="go">
+    Run Backup
+  </button>
+</form>
