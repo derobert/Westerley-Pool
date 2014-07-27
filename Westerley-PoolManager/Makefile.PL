@@ -33,6 +33,8 @@ requires 'Barcode::Code128';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Bytes::Random::Secure';
 
+requires 'Net::DBus';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 

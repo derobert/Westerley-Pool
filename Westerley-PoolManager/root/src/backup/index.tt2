@@ -1,8 +1,27 @@
 ﻿<form method="post" action="[% C.uri_for('/backup/run') %]">
+<b>Select which drive to back up to:</b><br>
+[% FOR fs = media.filesystems %]
+  <input type="radio" name="destination" value="[% fs.key | html %]">
+  [% media.drives.${fs.value.Drive}.Vendor | html %]
+  [% media.drives.${fs.value.Drive}.Model | html %]
+  Partition [% media.data.${fs.key}.${"org.freedesktop.UDisks2.Partition"}.Number | html %],
+  [% fs.value.IdType  | html %]
+  labeled <strong>“[% fs.value.IdLabel | html %]”</strong><br>
+[% END %]
   <button type="submit" name="op" value="go" style="margin: 1em">
     Run Backup
   </button>
 </form>
 
+[% IF media.empty.size > 0 %]
+<hr>
+<em>Note: The following drives have no media inserted. They might be
+valid backup candidates if media were inserted.</em>
+<ul>
+  [% FOR drive = media.empty.values %]
+  <li>[% drive.Vendor | html %] [% drive.Model | html %]</li>
+  [% END %]
+</ul>
+[% END %]
 <div style="padding-top: 2em;"></div>
 <a href="[% C.uri_for('/') %]">Main Menu</a>
