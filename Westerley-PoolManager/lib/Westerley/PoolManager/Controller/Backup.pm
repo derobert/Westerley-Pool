@@ -17,20 +17,6 @@ Catalyst Controller.
 
 =cut
 
-has setup_command => (
-	is       => 'ro',
-	isa      => 'Maybe[Str]',
-	required => 0,
-	default  => undef,
-);
-
-has cleanup_command => (
-	is       => 'ro',
-	isa      => 'Maybe[Str]',
-	required => 0,
-	default  => undef,
-);
-
 has db_name => (
 	is       => 'ro',
 	isa      => 'Str',
@@ -77,18 +63,30 @@ sub index :Path :Args(0) {
 
 sub run :Local :Args(0) {
 	my ($self, $c) = @_;
+	my $device = $c->req->params->{destination};
+
+	if (($device // '') eq '') {
+		$c->stash(err_no_device => 1);
+		$c->detach;
+	}
 
 	my $now = DateTime->now;
-	my $file = $now->strftime($self->destination);
-	$c->stash(file => $file);
+	my $filename = $now->strftime($self->destination);
+	$c->stash(file => $filename);
 
-	$c->log->debug("Performing backup setup command.");
-	system $self->setup_command if defined $self->setup_command;
-	$c->log->debug("Performing pg_dump.");
-	system qw(pg_dump -Fc -f), $file, '-Z', $self->compression, $self->db_name;
-	$c->stash(size => -s $file);
-	$c->log->debug("Performing backup cleanup command.");
-	system $self->cleanup_command if defined $self->cleanup_command;
+	$c->log->info("Requesting mount of $device...");
+	$c->model('DBus')->with_mount(
+		$device,
+		sub {
+			my $mount_path = shift;
+			$c->log->debug("Mounted at $mount_path.");
+			my $fullname = "$mount_path/$filename";
+
+			$c->log->debug("Performing pg_dump.");
+			system qw(pg_dump -Fc -f), $fullname, '-Z', $self->compression,
+				$self->db_name;
+			$c->stash(size => -s $fullname);
+		});
 
 	$c->stash(ok => 1);
 }

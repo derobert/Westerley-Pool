@@ -70,4 +70,27 @@ sub removable_media {
 	};
 }
 
+sub with_mount {
+	my ($self, $device, $code) = @_;
+
+	my $ud = $self->udisks2;
+	my $fs = $ud->get_object($device, 'org.freedesktop.UDisks2.Filesystem')
+		or die "Could not get fs object";
+
+	my $path = $fs->Mount({' auth.no_user_interaction' => 1});
+	eval { $code->($path) };
+	{
+		local $@;    # save exception from $code
+		for my $tries (0 .. 2) {    # try unmount 3 times, it needs to work!
+			$tries and sleep(1);
+			eval {
+				$fs->Unmount({' auth.no_user_interaction' => 1, force => 1});
+			};
+			$@ or last;
+		}
+		$@ and die;                 # it didn't work :-(
+	};
+	die if $@;
+}
+
 1;

@@ -16,7 +16,7 @@
 [% IF media.empty.size > 0 %]
 <hr>
 <em>Note: The following drives have no media inserted. They might be
-valid backup candidates if media were inserted.</em>
+valid backup destinations if media were inserted.</em>
 <ul>
   [% FOR drive = media.empty.values %]
   <li>[% drive.Vendor | html %] [% drive.Model | html %]</li>

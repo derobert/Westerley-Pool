@@ -1,10 +1,14 @@
-﻿[% UNLESS ok %]
-<strong>Something went wrong!</strong>
-[% END %]
+﻿[% IF err_no_device %]
+<p><strong>Error! No backup device selected. Press the back button and
+select one.</strong></p>
+[% ELSE %]
+  [% UNLESS ok %]
+<p><strong>Something went wrong!</strong></p>
+  [% ELSE %]
+<p><strong>Backup complete.</strong></p>
+  [% END %]
 
-Backup complete.
-
-<table style="margin: 2em;">
+<table style="margin: 2em; margin-top: 1em">
   <tr>
     <th>Backup File</th>
     <td><tt>[% file | html %]</tt></td>
@@ -14,5 +18,6 @@ Backup complete.
     <td>[% size | html %] bytes</td>
   </tr>
 </table>
+[% END %]
 
 <a href="[% C.uri_for('/') %]">Main Menu</a>
