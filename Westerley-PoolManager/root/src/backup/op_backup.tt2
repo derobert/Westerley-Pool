@@ -1,0 +1,19 @@
+﻿[% IF ok %]
+  <p>Backup complete.</p>
+[% ELSE %]
+  <p><strong>Something went wrong!</strong></p>
+[% END %]
+
+<table style="margin: 2em; margin-top: 1em">
+  <tr>
+    <th>Backup File</th>
+    <td><tt>[% file | html %]</tt></td>
+  </tr>
+  <tr>
+    <th>Backup Size</th>
+    <td>[% size | html %] bytes</td>
+  </tr>
+</table>
+
+<a href="[% C.uri_for('/backup') %]">Backup/Export Interface</a> | 
+<a href="[% C.uri_for('/') %]">Main Menu</a>

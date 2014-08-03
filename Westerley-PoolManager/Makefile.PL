@@ -33,6 +33,7 @@ requires 'Barcode::Code128';
 requires 'Crypt::Eksblowfish::Bcrypt';
 requires 'Bytes::Random::Secure';
 
+requires 'Text::CSV';
 requires 'Net::DBus' => '1.0.0.1';
 
 test_requires 'Test::More' => '0.88';

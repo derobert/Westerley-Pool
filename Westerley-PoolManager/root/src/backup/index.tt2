@@ -1,22 +1,37 @@
-﻿<form method="post" action="[% C.uri_for('/backup/run') %]">
-<b>Select which drive to back up to:</b><br>
+﻿<form method="post" action="[% C.uri_for('/backup/run') %]"
+ id="backup-form">
+  <strong style="margin-top: 2ex; display: block">Select which drive to
+  save to:</strong>
 [% FOR fs = media.filesystems %]
-  <input type="radio" name="destination" value="[% fs.key | html %]">
+  <input type="radio" name="destination" value="[% fs.key | html %]"
+  [%- IF media.filesystems.size == 1 -%]
+   checked
+  [%- END -%]
+  >
   [% media.drives.${fs.value.Drive}.Vendor | html %]
   [% media.drives.${fs.value.Drive}.Model | html %]
   Partition [% media.data.${fs.key}.${"org.freedesktop.UDisks2.Partition"}.Number | html %],
   [% fs.value.IdType  | html %]
   labeled <strong>“[% fs.value.IdLabel | html %]”</strong><br>
 [% END %]
-  <button type="submit" name="op" value="go" style="margin: 1em">
-    Run Backup
-  </button>
+
+  <strong style="margin-top: 2ex; display: block">Select what to
+  do:</strong>
+    <input type="radio" name="op" value="backup" id="radio-backup"
+    checked><label for="radio-backup">Back up all data</label><br>
+    <input type="radio" name="op" value="log_exp" id="radio-log-exp"><label
+    for="radio-log-exp">Export visitor log</label><br>
+    <input type="radio" name="op" value="err" id="radio-err"><label
+    for="radio-rr">Display an error message.</label><br>
+
+  <button type="submit" id="backup-submit" name="go" value="go"
+    style="margin: 1.5em; padding: 1ex">Do it.</button>
 </form>
 
 [% IF media.empty.size > 0 %]
 <hr>
 <em>Note: The following drives have no media inserted. They might be
-valid backup destinations if media were inserted.</em>
+valid destinations if media were inserted.</em>
 <ul>
   [% FOR drive = media.empty.values %]
   <li>[% drive.Vendor | html %] [% drive.Model | html %]</li>
@@ -25,3 +40,13 @@ valid backup destinations if media were inserted.</em>
 [% END %]
 <div style="padding-top: 2em;"></div>
 <a href="[% C.uri_for('/') %]">Main Menu</a>
+
+<script type="text/javascript">
+  $('#backup-form').submit(function(ev) {
+    $('#backup-submit').text('Please wait… running.').attr("disabled", "disabled");
+    return true;
+  });
+  $(window).unload(function() {
+    $('#backup-submit').text('Do it.').removeAttr('disabled');
+  });
+</script>

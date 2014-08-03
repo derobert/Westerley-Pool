@@ -1,23 +1,18 @@
-﻿[% IF err_no_device %]
-<p><strong>Error! No backup device selected. Press the back button and
-select one.</strong></p>
-[% ELSE %]
-  [% UNLESS ok %]
-<p><strong>Something went wrong!</strong></p>
-  [% ELSE %]
-<p><strong>Backup complete.</strong></p>
-  [% END %]
+﻿<p><strong>
+[%- IF err_no_device -%]
+  Error! No device selected. Press the back button and select one.
+[%- ELSIF err_no_op -%]
+  Error! You need to select what to do. Press the back button and select
+  something.
+[%- ELSIF err_bad_op -%]
+  Internal error! Unexpected operation “[%err_bad_op|html%]”. Please <a
+  href="[% site.bugurl | html %]">file a bug report</a>.
+[%- ELSE -%]
+  Internal error! The wrong template has been rendered, or an unknown
+  error has occured Please <a href="[% site.bugurl | html %]">file a bug
+  report</a>.
+[%- END -%]
+</strong></p>
 
-<table style="margin: 2em; margin-top: 1em">
-  <tr>
-    <th>Backup File</th>
-    <td><tt>[% file | html %]</tt></td>
-  </tr>
-  <tr>
-    <th>Backup Size</th>
-    <td>[% size | html %] bytes</td>
-  </tr>
-</table>
-[% END %]
-
+<a href="[% C.uri_for('/backup') %]">Backup/Export Interface</a> | 
 <a href="[% C.uri_for('/') %]">Main Menu</a>
