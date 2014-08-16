@@ -55,8 +55,8 @@ __PACKAGE__->config(
 	'Plugin::Authentication' => {
 		default => {
 			credential => {
-				class          => 'Password',
-				password_type  => 'self_check',
+				class         => 'Password',
+				password_type => 'self_check',
 			},
 			store => {
 				class         => 'DBIx::Class',
@@ -67,10 +67,11 @@ __PACKAGE__->config(
 		},
 	},
 	'Plugin::Session' => {
-		dbic_class    => 'Pool::Session',
-		id_field      => 'session_id',
-		data_field    => 'session_data',
-		expires_field => 'session_expires',
+		dbic_class     => 'Pool::Session',
+		id_field       => 'session_id',
+		data_field     => 'session_data',
+		expires_field  => 'session_expires',
+		cookie_expires => 0,
 	},
 );
 
