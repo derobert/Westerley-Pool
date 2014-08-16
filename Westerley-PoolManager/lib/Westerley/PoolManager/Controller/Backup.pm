@@ -5,6 +5,7 @@ use namespace::autoclean;
 use autodie qw(:all);
 use DateTime;    # massive overkill, but avoid POSIX::strftime (Windows)
 use Text::CSV;
+use IPC::Run3;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -38,7 +39,26 @@ has export_relpath => (
 	default  => 'export-%Y-%m-%d_%H%M%S_%Z.csv'
 );
 
-has compression => (
+subtype 'Westerley::PoolManager::EncryptTo',
+	as 'ArrayRef[Str]';
+
+coerce 'Westerley::PoolManager::EncryptTo',
+	from 'Str', via { [ $_ ] };
+
+has encrypt_to => (
+	is => 'ro',
+	isa => 'Westerley::PoolManager::EncryptTo',
+	coerce => 1,
+	required => 0,
+);
+
+has sign_with => (
+	is => 'ro',
+	isa => 'Str',
+	required => 0,
+);
+
+has compress => (
 	is  => 'ro',
 	isa => subtype('Int',
 		where { $_ >= 0 && $_ <= 9 },
@@ -46,6 +66,7 @@ has compression => (
 	),
 	required => 1,
 	default  => 9,
+	documentation => '0 = do not compress; 1 = fast; 9 = best',
 );
 
 =head1 METHODS
@@ -92,12 +113,96 @@ sub run :Local :Args(0) {
 
 }
 
+sub should_crypt : Private {
+	my $self = shift;
+
+	$self->sign_with || $self->encrypt_to;
+}
+
+sub should_compress : Private {
+	my $self = shift;
+
+	# if encrypting, do not, as gnupg does compression itself
+	!$self->should_crypt && $self->compress
+}
+
+sub get_fh_crypto : Private {
+	my ($self, $name) = @_;
+	local $_;
+
+	$self->should_crypt
+		or die "get_crypto_fh called when no crypto configured";
+
+	my @args = ('--batch', '--yes', '--output' => $name);
+	push @args, '--sign', '--local-user', $self->sign_with if $self->sign_with;
+	push @args, '--encrypt' if $self->encrypt_to;
+	push @args, map(('--recipient' => $_), @{$self->encrypt_to});
+
+	open my $fh, '|-:raw', 'gpg', @args
+		or die "open gpg pipe: $! $?";
+	return $fh;
+}
+
+sub get_fh_compressed : Private {
+	my ($self, $name) = @_;
+
+	$self->should_compress
+		or die "get_compressed_fh called when no compression configured";
+
+	open my $tmpfh, '>:raw', $name
+		or die "Could not open $name: $!";
+
+	my $pid = open my $fh, '|-';
+	defined($pid) or die "Could not fork: $!";
+
+	if (0 == $pid) {
+		# child
+		open STDOUT, '>&', $tmpfh or die "dup: $!";
+		exec 'gzip', '-'.$self->compress;
+		exit(1);
+	}
+	close $tmpfh; # belongs to child now
+
+	return $fh;
+}
+
+sub get_fh_boring : Private {
+	my ($self, $name) = @_;
+
+	open my $fh, '>:raw', $name
+		or die "open: $!";
+
+	return $fh;
+}
+
+sub get_fh : Private {
+	my ($self, $name, $nocomp) = @_;
+
+	$self->should_crypt and return $self->get_fh_crypto($name);
+	!$nocomp && $self->should_compress
+		and return $self->get_fh_compressed($name);
+	return $self->get_fh_boring($name);
+}
+
+sub get_name : Private {
+	my ($self, $tmpl, $nocomp) = @_;
+
+	my $now = DateTime->now;
+	my $name = $now->strftime($tmpl);
+
+	$name .= '.gz'  if $self->should_compress && !$nocomp;
+	$name .= '.gpg' if $self->should_crypt;
+
+	return $name;
+}
+
 sub op_backup : Private {
 	my ($self, $c, $device) = @_;
 	$c->stash(template => 'backup/op_backup.tt2');
 
-	my $now = DateTime->now;
-	my $filename = $now->strftime($self->backup_relpath);
+	# this one is special, as pg_dump does its own compression
+	my $zlevel = $self->should_crypt ? 0 : $self->compress;
+	my $filename = $self->get_name($self->backup_relpath, 1);
 	$c->stash(file => $filename);
 
 	$c->log->info("Requesting mount of $device...");
@@ -107,10 +212,11 @@ sub op_backup : Private {
 			my $mount_path = shift;
 			$c->log->debug("Mounted at $mount_path.");
 			my $fullname = "$mount_path/$filename";
+			my $fh = $self->get_fh($fullname, 1);
 
 			$c->log->debug("Performing pg_dump.");
-			system qw(pg_dump -Fc -f), $fullname, '-Z', $self->compression,
-				$self->db_name;
+			run3 [qw(pg_dump -Fc), '-Z', $zlevel, $self->db_name], \undef, $fh,
+				undef;
 			$c->stash(size => -s $fullname);
 		});
 
@@ -131,8 +237,7 @@ sub op_log_export : Private {
 	my $log = $c->model('Pool::Log')->search(undef, { order_by => 'log_num'})
 		or die "No log?";
 
-	my $now = DateTime->now;
-	my $filename = $now->strftime($self->export_relpath);
+	my $filename = $self->get_name($self->export_relpath);
 	$c->stash(file => $filename);
 
 	$c->log->info("Requesting mount of $device...");
@@ -143,7 +248,7 @@ sub op_log_export : Private {
 			$c->log->debug("Mounted at $mount_path.");
 			my $fullname = "$mount_path/$filename";
 
-			open my $fh, '>', $fullname
+			my $fh = $self->get_fh($fullname)
 				or die "Could not open $fullname: $!";
 			
 			my @cols = $log->result_source->columns;
