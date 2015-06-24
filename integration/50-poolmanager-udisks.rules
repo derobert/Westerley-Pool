@@ -1,0 +1,14 @@
+/* Allow pool manager user to manage removable disks via udisks
+ * NOTE: Debian Jessie is still on 0.105, so it doesn't use the JS rules
+ *       interface. Thus this is untested!
+*/
+polkit.addRule(function(action, subject) {
+	if ((action.id == 'org.freedesktop.udisks2.filesystem-mount' ||
+		 action.id == 'org.freedesktop.udisks2.filesystem-mount-other-seat' ||
+	     action.id == 'org.freedesktop.udisks2.power-off-drive' ||
+	     action.id == 'org.freedesktop.udisks2.power-off-drive-other-seat') &&
+	  subject.user == "pool-mgr" )
+	{
+		return polkit.Result.YES;
+	}
+});

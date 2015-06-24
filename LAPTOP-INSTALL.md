@@ -2,7 +2,8 @@ Installing Pool Manager on a Laptop
 ===================================
 
 This is written for Debian/jessie. Probably not much different on
-Ubuntu, but untested.
+Ubuntu, but untested. Note that Jessie-Backports must be enabled (added
+to `sources.list`) for `libnet-dbus-perl`.
 
 
 Packages
@@ -12,11 +13,13 @@ Install the following packages (which will pull in a lot of dependencies
 as well). Note when I did this, aptitude was set to install recommended
 packages:
 
-	starman postgresql libmodule-install-perl libcatalyst-perl
+	git udisks2 starman postgresql libmodule-install-perl libcatalyst-perl
 	libcatalyst-devel-perl libcatalyst-modules-perl
 	libdbix-class-helpers-perl libdbd-pg-perl libdatetime-format-pg-perl
 	libcairo-perl libpango-perl libgtk2-perl libbarcode-code128-perl
 	libcrypt-eksblowfish-perl libbytes-random-secure-perl
+	libtext-csv-perl libtext-csv-xs-perl libipc-run3-perl
+	libipc-system-simple-perl libnet-dbus-perl/jessie-backports 
 
 Note that `libcatalyst-devel-perl` probably is not required, except for
 the double-check step (Makefile.PL)
@@ -59,11 +62,18 @@ following:
     COMMIT;
     \q
 
+To add a sample administrator account to the system (username admin,
+password admin) additionally `\i sample-admin.sql`.
+
 Note that sample.sql contains sample data, and you may not want to load
 it.
 
-Back as root, copy the `westerley-poolmanager.service` file to
-`/etc/systemd/system` and then:
+Back as root, copy the `integration/westerley-poolmanager.service` file to
+`/etc/systemd/system/` and then:
 
     systemctl enable westerley-poolmanager.service
     systemctl start westerley-poolmanager.service
+
+Finally, copy `integration/westerley-poolmanager.pkla` to
+`/etc/polkit-1/localauthority/50-local.d/`. Polkit will automatically
+read the new file.
