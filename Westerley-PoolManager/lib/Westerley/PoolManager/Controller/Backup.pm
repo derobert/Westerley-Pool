@@ -206,21 +206,27 @@ sub op_backup : Private {
 	$c->stash(file => $filename);
 
 	$c->log->info("Requesting mount of $device...");
-	$c->model('DBus')->with_mount(
-		$device,
-		sub {
-			my $mount_path = shift;
-			$c->log->debug("Mounted at $mount_path.");
-			my $fullname = "$mount_path/$filename";
-			my $fh = $self->get_fh($fullname, 1);
+	eval {
+		$c->model('DBus')->with_mount(
+			$device,
+			sub {
+				my $mount_path = shift;
+				$c->log->debug("Mounted at $mount_path.");
+				my $fullname = "$mount_path/$filename";
+				my $fh = $self->get_fh($fullname, 1);
 
-			$c->log->debug("Performing pg_dump.");
-			run3 [qw(pg_dump -Fc), '-Z', $zlevel, $self->db_name], \undef, $fh,
-				undef;
-			$c->stash(size => -s $fullname);
-		});
-
-	$c->stash(ok => 1);
+				$c->log->debug("Performing pg_dump.");
+				run3 [qw(pg_dump -Fc), '-Z', $zlevel, $self->db_name], \undef, $fh,
+					undef;
+				$c->stash(size => -s $fullname);
+			});
+	};
+	if ($@) {
+		$c->log->error("Backup died: $@");
+		$c->stash(ok => 0);
+	} else {
+		$c->stash(ok => 1);
+	}
 }
 
 sub op_log_export : Private {
