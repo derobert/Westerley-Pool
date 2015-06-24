@@ -1,0 +1,19 @@
+﻿[% IF ok %]
+  <p>Export complete.</p>
+[% ELSE %]
+  <p><strong>Something went wrong!</strong></p>
+[% END %]
+
+<table style="margin: 2em; margin-top: 1em">
+  <tr>
+    <th>Export File</th>
+    <td><tt>[% file | html %]</tt></td>
+  </tr>
+  <tr>
+    <th>Export Size</th>
+    <td>[% size | html %] bytes</td>
+  </tr>
+</table>
+
+<a href="[% C.uri_for('/backup') %]">Backup/Export Interface</a> | 
+<a href="[% C.uri_for('/') %]">Main Menu</a>

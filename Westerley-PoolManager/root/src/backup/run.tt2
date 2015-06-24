@@ -1,18 +1,18 @@
-﻿[% UNLESS ok %]
-<strong>Something went wrong!</strong>
-[% END %]
+﻿<p><strong>
+[%- IF err_no_device -%]
+  Error! No device selected. Press the back button and select one.
+[%- ELSIF err_no_op -%]
+  Error! You need to select what to do. Press the back button and select
+  something.
+[%- ELSIF err_bad_op -%]
+  Internal error! Unexpected operation “[%err_bad_op|html%]”. Please <a
+  href="[% site.bugurl | html %]">file a bug report</a>.
+[%- ELSE -%]
+  Internal error! The wrong template has been rendered, or an unknown
+  error has occured Please <a href="[% site.bugurl | html %]">file a bug
+  report</a>.
+[%- END -%]
+</strong></p>
 
-Backup complete.
-
-<table style="margin: 2em;">
-  <tr>
-    <th>Backup File</th>
-    <td><tt>[% file | html %]</tt></td>
-  </tr>
-  <tr>
-    <th>Backup Size</th>
-    <td>[% size | html %] bytes</td>
-  </tr>
-</table>
-
+<a href="[% C.uri_for('/backup') %]">Backup/Export Interface</a> | 
 <a href="[% C.uri_for('/') %]">Main Menu</a>

@@ -14,6 +14,7 @@
    site = {
      title     => 'Westerley Pool Manager',
      copyright => '2014 Anthony DeRobertis',
+     bugurl    => 'https://github.com/derobert/Westerley-Pool/issues',
    };
 
    # load up any other configuration items

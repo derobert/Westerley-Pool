@@ -25,3 +25,10 @@ The setup we use is
 which first resets the scanner to defaults, then turns it to trigger
 once, scan until it finds a barcode, then finally sets F2 as a preamble.
 A PDF of this output is included, see barcode-setup.pdf.
+
+UDisks2
+-------
+
+The backup page uses UDisks2 to detect and mount removable drives for
+backups. This means you need UDisks2 installed and running. Also, you
+need to set up PolicyKit to allow the app to mount/unmount disks.

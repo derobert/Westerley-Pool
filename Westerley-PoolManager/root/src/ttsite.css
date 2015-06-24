@@ -37,6 +37,13 @@ body {
     background-color: [% site.col.head %];
     border-bottom: 1px solid [% site.col.line %];
 }
+.title a {
+	text-decoration: none;
+	color: inherit;
+}
+.title a:hover {
+	text-decoration: underline;
+}
 
 #content {
     padding-left: 1ex;
