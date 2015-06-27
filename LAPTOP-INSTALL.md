@@ -77,3 +77,60 @@ Back as root, copy the `integration/westerley-poolmanager.service` file to
 Finally, copy `integration/westerley-poolmanager.pkla` to
 `/etc/polkit-1/localauthority/50-local.d/`. Polkit will automatically
 read the new file.
+
+Pull up a web browser and visit http://localhost/ to make sure it's
+working.
+
+Backup
+------
+
+The backup code can now (optionally) encrypt and sign backups. Crypto is
+done through GnuPG. There are a few steps to enabling it:
+
+First, switch to the `pool-mgr` user.
+
+Signing backups requires generating a keypair. To do so, run `gpg
+--gen-key`. When prompted, pick either "RSA (sign only)" or "RSA and RSA
+(default)". I suggest a reasonably long key, at least 3072 bits.
+Probably shouldn't expire. You can put whatever you want for "Real
+name"; email and comment can be left blank. When prompted, *leave the
+passphrase blank.* You'll might be asked if you're sure a few times.
+
+After generating the key (which may take a bit), it will output some
+information. Look for the "key fingerprint":
+
+    pub   3072R/78756524 2015-06-27
+          Key fingerprint = 1268 BCC4 3077 B320 F0BC  E763 DF41 2F98 7875 6524
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you write that without spaces and put a 0x in front (e.g.,
+0x1268BCC43077B320F0BCE763DF412F9878756524) then that's the KEY-ID.
+
+Second, some useful gpg commands to move keys around:
+
+	# export a public key to a file
+    gpg --armor --output pubkeyfile.gpg --export KEY-ID
+
+	# import a public key from a file
+	gpg --import pubkeyfile.gpg
+
+	# export a public key to the key servers
+	gpg --send-keys KEY-ID
+
+	# import a public key from the key servers
+	gpg --recv-keys KEY-ID
+
+Next, you'll need to decide which keys you want to be able to *read*
+(decrypt) the backups. Import those public keys; see the commands above.
+
+Finally, edit `westerley\_poolmanager.conf` (located in
+`Westerley-Pool/Westerley-PoolManager`) and look for the
+`<Component Controller::Backup>` section. You should see commented out
+`sign\_with` and `encrypt\_to` directives. Put the KEY-ID of the key you
+generated above as `sign\_with`. Now put as many `encrypt\_to`
+directives as you need to specify all the people able to decrypt/read
+the backups (use KEY-IDs for them, too).
+
+After editing the configuration file, restart the program by running
+`systemctl restart westerley-poolmanager.service` (the config is only
+read when starting).
