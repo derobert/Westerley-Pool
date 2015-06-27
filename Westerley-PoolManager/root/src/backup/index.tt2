@@ -21,8 +21,6 @@
     checked><label for="radio-backup">Back up all data</label><br>
     <input type="radio" name="op" value="log_exp" id="radio-log-exp"><label
     for="radio-log-exp">Export visitor log</label><br>
-    <input type="radio" name="op" value="err" id="radio-err"><label
-    for="radio-rr">Display an error message.</label><br>
 
   <button type="submit" id="backup-submit" name="go" value="go"
     style="margin: 1.5em; padding: 1ex">Do it.</button>
