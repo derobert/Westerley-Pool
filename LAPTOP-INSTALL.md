@@ -104,7 +104,7 @@ information. Look for the "key fingerprint":
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you write that without spaces and put a 0x in front (e.g.,
-0x1268BCC43077B320F0BCE763DF412F9878756524) then that's the KEY-ID.
+`0x1268BCC43077B320F0BCE763DF412F9878756524`) then that's the KEY-ID.
 
 Second, some useful gpg commands to move keys around:
 
@@ -123,11 +123,11 @@ Second, some useful gpg commands to move keys around:
 Next, you'll need to decide which keys you want to be able to *read*
 (decrypt) the backups. Import those public keys; see the commands above.
 
-Finally, edit `westerley\_poolmanager.conf` (located in
+Finally, edit `westerley_poolmanager.conf` (located in
 `Westerley-Pool/Westerley-PoolManager`) and look for the
 `<Component Controller::Backup>` section. You should see commented out
-`sign\_with` and `encrypt\_to` directives. Put the KEY-ID of the key you
-generated above as `sign\_with`. Now put as many `encrypt\_to`
+`sign_with` and `encrypt_to` directives. Put the KEY-ID of the key you
+generated above as `sign_with`. Now put as many `encrypt_to`
 directives as you need to specify all the people able to decrypt/read
 the backups (use KEY-IDs for them, too).
 
