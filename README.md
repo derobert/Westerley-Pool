@@ -32,3 +32,10 @@ UDisks2
 The backup page uses UDisks2 to detect and mount removable drives for
 backups. This means you need UDisks2 installed and running. Also, you
 need to set up PolicyKit to allow the app to mount/unmount disks.
+
+
+Setup Directions
+----------------
+
+Check the `LAPTOP-INSTALL.md` file for directions on setting it up on
+the Westerley pool laptop. The same steps also work on a VM.
