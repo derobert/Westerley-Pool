@@ -133,7 +133,8 @@ sub get_fh_crypto : Private {
 	$self->should_crypt
 		or die "get_crypto_fh called when no crypto configured";
 
-	my @args = ('--batch', '--yes', '--output' => $name);
+	my @args = ('--batch', '--yes', '--trust-model', 'always',
+		'--output' => $name);
 	push @args, '--sign', '--local-user', $self->sign_with if $self->sign_with;
 	push @args, '--encrypt' if $self->encrypt_to;
 	push @args, map(('--recipient' => $_), @{$self->encrypt_to});
