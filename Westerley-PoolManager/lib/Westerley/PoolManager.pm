@@ -73,6 +73,9 @@ __PACKAGE__->config(
 		expires_field  => 'session_expires',
 		cookie_expires => 0,
 	},
+	'View::JSON' => {
+		expose_stash => 'JSON',
+	},
 );
 
 after setup_finalize => sub {

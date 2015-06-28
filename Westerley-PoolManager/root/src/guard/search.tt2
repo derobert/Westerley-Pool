@@ -1,0 +1,77 @@
+﻿<style>
+  .cards {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    margin-top: 1em;
+  }
+  .card {
+    width: 300px;
+    margin-bottom: 2em;
+    margin-right: 1em;
+    height: 150px;
+    background: rgb(240,255,255);
+    border: 1px solid rgb(200,255,255);
+    position: relative;
+  }
+  .photo {
+    width: 113px;
+    height: 150px;
+    object-fit: contain;
+    object-position: center;
+    position: absolute;
+  }
+  .card > span {
+    display: block;
+    margin-left: calc(113px + 1em);
+  }
+  .name { font-weight: bold;}
+  .agegroup { margin-top: 1ex; font-style: italic; }
+  .checkin { position: absolute; bottom: 1ex; }
+  .go-away { background: red; font-weight: bold; padding: 5px; }
+</style>
+<script type="text/javascript">
+    function check_in(btn, pass_num) {
+        jQuery.post(
+            "[% C.uri_for('/guard/checkin') %]", { "pass_num": pass_num },
+            function(dat, stat, req) {
+                if (dat.status) {
+                    $(btn).html('Checked in');
+                    $(btn).attr('disabled', 1);
+                } else {
+                    alert("Checkin failed!");
+                }
+            }, 'json'
+        );
+        return true;
+    }
+</script>
+
+[% IF error %]
+<p class="error"><strong>ERROR!</strong> [% error | html %]</p>
+[% ELSE %]
+<div class="cards">
+  [% FOREACH p = passes %]
+<div class="card">
+  <a href="[% C.uri_for('/guard/pass', p.pass_num, { from_search => 1 }) | html %]"><img
+   class="photo"
+   src="[% C.uri_for('/jpeg/view', p.passholder_num) | html%]"></a>
+  <span class="name">[% p.passholder.holder_name | html %]</span>
+  <span class="address">
+    [% p.passholder.family.unit.house_number | html %]
+    [% p.passholder.family.unit.street.street_name | html %]
+  </span>
+  <span class="agegroup">
+    [% p.passholder.age_group.age_group_name | html %]
+  </span>
+  <span class="checkin">
+    [% IF p.allow_admission %]
+    <button type="button" onclick="check_in(this, [% p.pass_num | html %])">Check In</button>
+    [% ELSE %]
+    <span class="go-away">[% site.messages.no_admit_short %]</span>
+    [% END %]
+  </span>
+</div>
+  [% END %]
+</div>
+[% END %]

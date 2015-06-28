@@ -52,7 +52,7 @@
     [% IF pass.allow_admission %]
       [% IF checked_in %]
         <strong>Checked in.</strong>
-      [% ELSE %]
+      [% ELSIF !from_search %]
 <form method="post">
    <button name="op" value="checkin">Check In</button>
 </form>
@@ -77,4 +77,11 @@ confirm the number was entered or scanned correctly.
 [% PROCESS 'guard/inc_searchforms.tt2' %]
 [% END %]
 
+<p style="font-size: large; margin: 2ex;">
+<span style="padding-left: 3ex"></span>
+[% IF from_search %]
+<a href="javascript:window.history.back()">Back</a>
+[% ELSE %]
 <a href="[% C.uri_for('/guard') %]">Menu</a>
+[% END %]
+</p>

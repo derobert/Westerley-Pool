@@ -1,5 +1,6 @@
 [%
 	site.messages = {
 		no_admit = '<h1>Do not admit</h1><p>If the member objects, please have him/her contact our management company, Horizon, at (540)&nbsp;751-1888.</p>'
+		no_admit_short = 'Do not admit.'
 	}
 %]
