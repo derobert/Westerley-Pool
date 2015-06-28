@@ -75,6 +75,13 @@ __PACKAGE__->config(
 	},
 );
 
+after setup_finalize => sub {
+	my $c = shift;
+	STDERR->autoflush(1);
+	$c->log->debug("PID $$ turned on autoflush on STDERR");
+};
+
+
 # Start the application
 __PACKAGE__->setup();
 
