@@ -1,5 +1,6 @@
 [%
 	site.messages = {
 		no_admit = '<h1>Do not admit</h1>'
+		no_admit_short = 'Do not admit.'
 	}
 %]

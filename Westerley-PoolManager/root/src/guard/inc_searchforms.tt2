@@ -1,7 +1,16 @@
-﻿<form method="get" action="[% search_by_name %]">
-<label for="search-by-name">Member's name</label>: <input id="search-by-name" name="name">
+﻿<form method="get" action="[% search %]">
+<label for="guard-search-number">Member's address</label>: <input id="guard-search-number" name="house_number" size=6>
+<select name="street_ref"> 
+  <option value="">—Any—</option>
+[% FOREACH s IN streets %]
+  <option value="[% s.street_ref | html %]">[% s.street_name | html%]</option>
+[% END %]
+</select>
+
 <input type="submit" value="Go">
 </form>
+
+<br>
 
 <label for="search-by-pass-no">Pass number</label>: <input id="search-by-pass-no" name="pass_no">
 <button onclick="window.location.href='[%lookup_by_pass_no%]/'+document.getElementById('search-by-pass-no').value">Go</button>
