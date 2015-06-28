@@ -16,14 +16,14 @@
 [%- FOR rec IN checkin %]
   <tr>
     <td>[% rec.log_time | html %]</td>
-    <td>[% rec.pass_num | html %]</td>
+    <td><a href="[%lookup_by_pass_no%]/[% rec.pass_num | html %]">[% rec.pass_num | html %]</a></td>
     <td>[% rec.holder_name | html %]</td>
     <td>[% rec.house_number | html %] [% rec.street_name | html %]</td>
   </tr>
 [%- END %]
 </table>
 
-<h1>Passes Scanned Today</h1>
+<h1>Passes Viewed/Scanned Today</h1>
 <table>
   <tr>
     <th>When</th>
