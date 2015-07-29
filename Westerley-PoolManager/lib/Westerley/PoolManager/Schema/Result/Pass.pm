@@ -62,6 +62,11 @@ __PACKAGE__->table("passes");
   default_value: true
   is_nullable: 0
 
+=head2 pass_printed
+
+  data_type: 'timestamp with time zone'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -78,6 +83,8 @@ __PACKAGE__->add_columns(
   },
   "pass_valid",
   { data_type => "boolean", default_value => \"true", is_nullable => 0 },
+  "pass_printed",
+  { data_type => "timestamp with time zone", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -130,8 +137,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-05-25 13:04:57
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:efGffztpgcJZq6fQS86rwA
+# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-29 04:53:27
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cZ/WtFAYxrLoaEM/WBX97g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
