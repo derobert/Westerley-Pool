@@ -245,7 +245,8 @@ sub edit_passholder : Path('/passholder') Args(2) {
 		$passholder = $c->model('Pool::Passholder')
 			->new_result({family_num => $family_num});
 	} else {
-		$passholder = $c->model('Pool::Passholder')->find($passholder_num)
+		$passholder = $c->model('Pool::Passholder')
+			->find($passholder_num, {prefetch => 'passes', order_by => 'passes.pass_issued'})
 			or die "No such passholder";
 	}
 
@@ -263,6 +264,16 @@ sub edit_passholder : Path('/passholder') Args(2) {
 				$passholder->holder_photo(decode_base64($jpeg));
 			}
 			$passholder->update_or_insert();
+
+			foreach my $p ($c->req->params->keys) {
+				if ($p =~ /^pass_valid_(\d+)$/a) {
+					$passholder->passes->find($1)->update({ pass_valid => scalar $c->req->param($p) });
+				} elsif ($p =~ /^pass_issue_new$/) {
+					my $pass = $passholder->issue_pass;
+					$c->log->debug("Issued pass #@{[$pass->pass_num]} to passholder #@{[$passholder->passholder_num]}.");
+				}
+			}
+
 			$c->res->redirect($c->uri_for_action('admin/edit_family',
 					$passholder->family_num), 303);
 			$c->detach;

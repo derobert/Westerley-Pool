@@ -23,6 +23,39 @@
     padding: 1ex;
   }
 
+  .passes {
+    margin-top: 2ex;
+    margin-bottom: 4ex;
+  }
+
+  .passes table {
+    border: 2px solid #c0c0c0;
+    border-collapse: collapse;
+    margin-left: 1ex;
+    width: 70%;
+  }
+
+  .passes caption {
+    font-size: 1.1225rem;
+    font-weight: bold;
+    padding-bottom: 0.5ex;
+    text-align: left;
+  }
+  .passes caption:after { content: ":"; }
+
+  .passes th, .passes td {
+    text-align: left;
+    vertical-align: middle;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    border-top: 1px solid #b0b0b0;
+    border-bottom: 1px solid #b0b0b0;
+    padding: 0.5ex;
+  }
+  .passes td.issue-new {
+    font-weight: bold;
+  }
+
   #camera-ui {
     background: rgb(128,128,128);
     position: absolute;
@@ -126,6 +159,41 @@
 </table>
 <!--  new-jpeg is filled by JavaScript if the user takes a new picture -->
 <input type="hidden" id="jpeg-data" name="new-jpeg" value="">
+
+<div class="passes">
+  <table>
+    <caption>Passes issued to this Passholder</caption>
+    <tr>
+      <th>Pass Number</th>
+      <th>Issued</th>
+      <th>Printed</th>
+      <th>Valid</th>
+    </tr>
+[%- FOR pass = passholder.passes %]
+    <tr>
+      <td>[% pass.pass_num | html %]</td>
+      <td>[% pass.pass_issued | html %]</td>
+      <td>[% pass.pass_printed | html %]</td>
+      <td>
+        <label><input type="radio" name="pass_valid_[% pass.pass_num %]" value="1"
+        [%- pass.pass_valid ? ' checked' : '' %]>Y</label>
+        <label><input type="radio" name="pass_valid_[% pass.pass_num %]" value="0"
+        [%- pass.pass_valid ? '' : ' checked' %]>N</label>
+      </td>
+    </tr>
+[%- END %]
+    <tr>
+      <td colspan="4" class="issue-new">
+        <label>
+          <input type="checkbox" name="pass_issue_new" id="issue_new_pass"
+           [%- passholder.passes.size ? '' : ' checked' %]>
+          Issue New Pass
+        </label>
+      </td>
+    </tr>
+  </table>
+</div>
+
 <button type="submit" name="op" value="save">Save</button>
 </form>
 
