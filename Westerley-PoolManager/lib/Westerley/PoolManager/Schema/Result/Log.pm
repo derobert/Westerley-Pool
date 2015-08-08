@@ -55,7 +55,7 @@ __PACKAGE__->table("log");
 =head2 log_type
 
   data_type: 'enum'
-  extra: {custom_type_name => "log_entry_type",list => ["view","checkin","checkout"]}
+  extra: {custom_type_name => "log_entry_type",list => ["view","checkin","checkout","checkin_scanned","checkin_search"]}
   is_nullable: 0
 
 =head2 pass_num
@@ -113,7 +113,13 @@ __PACKAGE__->add_columns(
     data_type => "enum",
     extra => {
       custom_type_name => "log_entry_type",
-      list => ["view", "checkin", "checkout"],
+      list => [
+        "view",
+        "checkin",
+        "checkout",
+        "checkin_scanned",
+        "checkin_search",
+      ],
     },
     is_nullable => 0,
   },
@@ -174,8 +180,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-05-25 13:19:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zIS02NBc4DWQKN35KUtYiw
+# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-08-07 23:12:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7MK3fyjcaBCtEu4UkLwEAg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

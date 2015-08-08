@@ -84,8 +84,9 @@ CREATE TABLE passes (
 	pass_num        INTEGER NOT NULL PRIMARY KEY,
 
 	passholder_num  INTEGER NULL REFERENCES passholders ON DELETE SET NULL,
-	pass_issued    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	pass_valid     BOOLEAN NOT NULL DEFAULT TRUE
+	pass_issued     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	pass_printed    TIMESTAMP WITH TIME ZONE NULL DEFAULT NULL,
+	pass_valid      BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE contacts (
@@ -139,7 +140,9 @@ CREATE UNLOGGED TABLE sessions (
 CREATE TYPE log_entry_type AS ENUM (
 	'view',     -- pass viewed (e.g., scanned with barcode scanner)
 	'checkin',  -- guard pressed checkin button
-	'checkout'  -- guard pressed checkout button (future)
+	'checkout', -- guard pressed checkout button (future)
+	'checkin_scanned', -- guard checked in after scanning pass
+	'checkin_search', -- guard checked in after searching by address (etc.)
 );
 
 CREATE TABLE log (
