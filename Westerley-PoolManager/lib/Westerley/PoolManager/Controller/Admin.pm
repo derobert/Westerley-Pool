@@ -61,6 +61,7 @@ sub index :Path :Args(0) {
 		];
 
 	$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable;
+	$c->stash->{passes_to_print} = $c->model('Pool::Pass')->search_printable;
 	$c->stash->{issue_uri} = $c->uri_for_action('/admin/issue');
 }
 
