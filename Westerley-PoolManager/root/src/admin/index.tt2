@@ -53,7 +53,7 @@
 [%- IF unprinted %]
 <p>
   There are [% unprinted %] already-issued, valid passes to print. You
-  may <a href="[%issue_uri|html%]">print (issue) passes</a>.
+  may <a href="[%print_uri|html%]">print (issue) passes</a>.
 </p>
 [%- ELSE %]
 <p>
