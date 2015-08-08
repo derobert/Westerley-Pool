@@ -140,7 +140,9 @@ CREATE UNLOGGED TABLE sessions (
 CREATE TYPE log_entry_type AS ENUM (
 	'view',     -- pass viewed (e.g., scanned with barcode scanner)
 	'checkin',  -- guard pressed checkin button
-	'checkout'  -- guard pressed checkout button (future)
+	'checkout', -- guard pressed checkout button (future)
+	'checkin_scanned', -- guard checked in after scanning pass
+	'checkin_search', -- guard checked in after searching by address (etc.)
 );
 
 CREATE TABLE log (
