@@ -52,7 +52,10 @@
 <p class="error"><strong>ERROR!</strong> [% error | html %]</p>
 [% ELSE %]
 <div class="cards">
-  [% FOREACH p = passes %]
+  [%- last_ph = -1 %]
+  [%- FOREACH p = passes %]
+  [%-   IF last_ph != p.passholder_num %]
+  [%      last_ph = p.passholder_num %]
 <div class="card">
   <a href="[% C.uri_for('/guard/pass', p.pass_num, { from_search => 1 }) | html %]"><img
    class="photo"
@@ -73,6 +76,7 @@
     [% END %]
   </span>
 </div>
-  [% END %]
+  [%-   END %]
+  [%- END %]
 </div>
 [% END %]
