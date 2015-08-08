@@ -10,14 +10,16 @@ extends 'DBIx::Class::ResultSet';
 sub BUILDARGS { $_[2] }
 
 sub search_printable {
-	my $self = shift;
+	my ($self, $extra) = @_;
+	$extra //= {};
 
 	$self->search({
 		'me.pass_printed' => undef,
 		'me.pass_valid' => 1,
 		'passholder.holder_photo' => {'!=', undef },
 	}, {
-		join => 'passholder'
+		join => 'passholder',
+		%$extra
 	});
 }
 
