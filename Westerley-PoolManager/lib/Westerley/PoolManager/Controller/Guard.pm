@@ -59,7 +59,7 @@ sub pass :Local :Args(1) {
 
 	my $op = $c->req->params->{op} // '';
 	if ('checkin' eq $op) {
-		$c->model('Pool')->log_pass(checkin => $row);
+		$c->model('Pool')->log_pass(checkin_scanned => $row);
 		$c->stash(checked_in => 1);
 	} else {
 		$c->model('Pool')->log_pass(view => $row);
@@ -71,6 +71,12 @@ sub pass :Local :Args(1) {
 sub checkin :Local :Args(0) :POST {
 	my ($self, $c) = @_;
 	$c->stash->{current_view} = 'JSON';
+	
+	my $type = $c->req->params->{checkin_type} // 'invalid';
+	unless ($type =~ /^(?: scanned | search )$/x) {
+		$c->stash->{JSON} = { status => 0 };
+		return;
+	}
 
 	# FIXME: This winds up pulling the jpeg...
 	my $row = $c->model('Pool::Pass')->find($c->req->params->{pass_num}, {
@@ -79,7 +85,7 @@ sub checkin :Local :Args(0) :POST {
 		},
 	});
 	if ($row) {
-		$c->model('Pool')->log_pass(checkin => $row);
+		$c->model('Pool')->log_pass("checkin_$type" => $row);
 		$c->stash->{JSON} = { status => 1 };
 	} else {
 		$c->stash->{JSON} = { status => 0 };
@@ -113,7 +119,7 @@ sub search :Local :Args(0) {
 				prefetch =>
 					{passholder => {family => {unit => 'street'}, age_group => undef}},
 				order_by =>
-					['unit.unit_num', 'family.family_num', 'passholder.holder_name'],
+					['unit.unit_num', 'family.family_num', 'passholder.holder_name', 'me.pass_num'],
 			})];
 }
 
@@ -122,7 +128,7 @@ sub today : Local Args(0) {
 
 	$c->stash->{checkin} = [
 		$c->model('Pool::Log')->search({
-				log_type => 'checkin',
+				log_type => [qw(checkin checkin_scanned checkin_search) ],
 				log_time => {'>=', \q{DATE_TRUNC('day', CURRENT_TIMESTAMP)}}})];
 	$c->stash->{scanned} = [
 		$c->model('Pool::Log')->search({

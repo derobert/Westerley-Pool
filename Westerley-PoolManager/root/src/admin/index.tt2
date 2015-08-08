@@ -28,13 +28,43 @@
   </tr>
 </table>
 
-<h1>Print Passes</h1>
-[% count = passes_to_issue.count %]
-[% IF count %]
-There are [% count %] passes to print. You may <a
-href="[%issue_uri|html%]">print (issue) passes</a>.
-[% ELSE %]
-There are no unprinted passes. If you need to print a pass for someone,
-either enter the person into the system or first invalidate the existing
-pass.
-[% END %]
+<h1>Issue & Print Passes</h1>
+[%- unprinted = passes_to_print.count %]
+[%- unissued = passes_to_issue.count %]
+[%- IF unissued %]
+<p>
+  There are [% unissued %] passholder(s) in the system with no valid,
+  issued passes. To issue them passes, please check their individual
+  passholder pages:
+</p>
+<ul>
+    [%- FOR ph = passes_to_issue.all %]
+        [%- unit = ph.family.unit -%]
+  <li>
+    <a href="[% C.uri_for('/passholder', ph.family_num, ph.passholder_num) | html %]">[% ph.holder_name | html %] of [% unit.house_number %] [% unit.street.street_name %]</a>
+  </li>
+    [%- END %]
+</ul>
+[%- ELSE %]
+<p>
+  All passholders in the system have at least one valid, issued pass.
+</p>
+[%- END %]
+[%- IF unprinted %]
+<p>
+  There are [% unprinted %] already-issued, valid passes to print. You
+  may <a href="[%print_uri|html%]">print (issue) passes</a>.
+</p>
+[%- ELSE %]
+<p>
+  There are no unprinted, issued passes. If you expected some, confirm
+  that:
+</p>
+<ul>
+    [%- IF unissued %]
+  <li>The passholder has been issued a pass in the system.</li>
+    [%- END %]
+  <li>The passholder has his/her photo in the system.</li>
+  <li>The pass is marked as valid.</li>
+</ul>
+[%- END %]

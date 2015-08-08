@@ -61,16 +61,17 @@ sub index :Path :Args(0) {
 		];
 
 	$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable;
-	$c->stash->{issue_uri} = $c->uri_for_action('/admin/issue');
+	$c->stash->{passes_to_print} = $c->model('Pool::Pass')->search_printable;
+	$c->stash->{print_uri} = $c->uri_for_action('/admin/print');
 }
 
-sub issue : Path('/pass/issue') Args(0) {
+sub print : Path('/pass/print') Args(0) {
     my ( $self, $c ) = @_;
 	my $op = $c->req->params->{op} // 'list';
 	$c->stash->{op} = $op;
 
 	if ('list' eq $op) {
-		$c->stash->{passes_to_issue} = $c->model('Pool')->search_issuable({order_by => 'me.holder_name' });
+		$c->stash->{passes} = [ $c->model('Pool::Pass')->search_printable({order_by => 'passholder.holder_name', prefetch => 'passholder' })->all ];
 		$c->detach;
 	} elsif ('issue' eq $op || 'print' eq $op) { 
 		$c->stash->{passes_to_issue} = $c->model('Pool::Passholder')
@@ -85,24 +86,23 @@ sub issue : Path('/pass/issue') Args(0) {
 	$c->model('Pool')->txn_do(sub {
 		# issue passes
 		my @passes;
-		if ('issue' eq $op) {
+		if ('print' eq $op) {
 			foreach my $phnum ($c->req->params->get_all('which')) {
-				my $pnum = int rand 2**31;
-				push @passes, $c->model('Pool::Pass')->create({
-						passholder_num => $phnum,
-						pass_num => $pnum,
-				});
-				# FIXME: Reload from DB to get the issue date.
-				$c->log->info("Created pass for $phnum: pass $pnum");
+				push @passes, $c->model('Pool::Pass')->find($phnum);
 			}
-		} elsif ('print' eq $op) {
-			die "Load passes to reprint from db";
+		} else {
+			die "Unknown op: $op";
 		}
 
 		# print passes
 		$c->stash->{passes} = \@passes;
 		$c->forward('View::PassesPDF');
 		die join "\n", @{ $c->error } if @{ $c->error };
+
+		# set printed in db
+		foreach my $pass (@passes) {
+			$pass->update({pass_printed => \'CURRENT_TIMESTAMP'});
+		}
 	});
 }
 
@@ -245,7 +245,8 @@ sub edit_passholder : Path('/passholder') Args(2) {
 		$passholder = $c->model('Pool::Passholder')
 			->new_result({family_num => $family_num});
 	} else {
-		$passholder = $c->model('Pool::Passholder')->find($passholder_num)
+		$passholder = $c->model('Pool::Passholder')
+			->find($passholder_num, {prefetch => 'passes', order_by => 'passes.pass_issued'})
 			or die "No such passholder";
 	}
 
@@ -263,6 +264,16 @@ sub edit_passholder : Path('/passholder') Args(2) {
 				$passholder->holder_photo(decode_base64($jpeg));
 			}
 			$passholder->update_or_insert();
+
+			foreach my $p ($c->req->params->keys) {
+				if ($p =~ /^pass_valid_(\d+)$/a) {
+					$passholder->passes->find($1)->update({ pass_valid => scalar $c->req->param($p) });
+				} elsif ($p =~ /^pass_issue_new$/) {
+					my $pass = $passholder->issue_pass;
+					$c->log->debug("Issued pass #@{[$pass->pass_num]} to passholder #@{[$passholder->passholder_num]}.");
+				}
+			}
+
 			$c->res->redirect($c->uri_for_action('admin/edit_family',
 					$passholder->family_num), 303);
 			$c->detach;
