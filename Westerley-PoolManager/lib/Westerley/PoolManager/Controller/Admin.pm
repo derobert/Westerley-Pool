@@ -46,7 +46,7 @@ sub index :Path :Args(0) {
 	}
 
 	if ($c->req->params->{by_address}) {
-		my $unit = $c->model('Pool::Unit')->find({ house_number => $c->req->params->{house_number}, street_ref => $c->req->params->{street_ref}});
+		my $unit = $c->model('Pool::Unit')->find({ house_number => 0+$c->req->params->{house_number}, street_ref => $c->req->params->{street_ref}});
 		if ($unit) {
 			$c->res->redirect( $c->uri_for_action('admin/show_unit', $unit->unit_num), 303);
 			$c->detach;
@@ -277,12 +277,38 @@ sub edit_passholder : Path('/passholder') Args(2) {
 			$c->res->redirect($c->uri_for_action('admin/edit_family',
 					$passholder->family_num), 303);
 			$c->detach;
+		} elsif ('delete' eq $op) {
+			$c->res->redirect($c->uri_for_action('admin/delete_passholder',
+					$passholder_num), 303);
+			$c->detach;
 		} else {
 			die "Uknown up";
 		}
 	}
 
 	$c->stash->{passholder} = $passholder;
+}
+
+sub delete_passholder : Path('/delete_passholder') Args(1) {
+	my ($self, $c, $passholder_num) = @_;
+
+	my $passholder = $c->model('Pool::Passholder')
+		->find($passholder_num, {prefetch => 'passes', order_by => 'passes.pass_issued'})
+		or die "No such passholder";
+	$c->stash->{cancel} = $c->uri_for_action('/admin/edit_passholder', $passholder->family_num, $passholder->passholder_num);
+	$c->stash->{passholder} = $passholder;
+
+	if (defined(my $confirm = $c->req->params->{confirm})) {
+		if ('yes' eq $confirm) {
+			my $family_num = $passholder->family_num;
+			$c->log->info("Deleting passholder $passholder_num.");
+			$passholder->delete;
+			$c->res->redirect($c->uri_for_action('admin/edit_family', $family_num), 303);
+			$c->detach;
+		} else {
+			die "Unexpected confirm '$confirm'";
+		}
+	}
 }
 
 

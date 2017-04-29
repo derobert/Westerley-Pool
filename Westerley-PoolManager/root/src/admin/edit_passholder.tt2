@@ -56,6 +56,20 @@
     font-weight: bold;
   }
 
+  .savebutton {
+    font-weight: bold;
+    font-size: 110%;
+    float: right;
+    margin-top: 1ex;
+    margin-right: 30%;
+  }
+
+  .delbutton {
+    background: rgb(255,200,200);
+    margin-top: 2ex;
+    font-size: 90%;
+  }
+
   #camera-ui {
     background: rgb(128,128,128);
     position: absolute;
@@ -194,7 +208,12 @@
   </table>
 </div>
 
-<button type="submit" name="op" value="save">Save</button>
+[%- IF passholder.passholder_num %]
+<button type="submit" name="op" value="delete"
+        class="delbutton">Delete...</button>
+[%- END %]
+<button type="submit" name="op" value="save"
+        class="savebutton">Save</button>
 </form>
 
 <script>

@@ -1,0 +1,93 @@
+﻿<style>
+  .photo {
+    float: right;
+    position: relative;
+    border: 1px solid rgb(230,230,230);
+  }
+  .photo .header {
+    display: block;
+    font-family: Futura;
+    font-weight: 900;
+    font-size: 200%;
+    text-align: center;
+  }
+  .photo .xxx {
+    display: block;
+    position: absolute;
+    bottom: 35%;
+    left: 1ex;
+    right: 1ex;
+    overflow: hidden;
+    font-family: Courier, Courier New;
+    font-size: 150%;
+    font-weight: bold;
+    font-stretch: expanded;
+  }
+  .photo img { 
+    width: 201px;
+    height: 268px;
+    display: block;
+    object-fit: contain;
+    object-position: bottom;
+    background: rgb(250,250,250);
+    padding: 1ex;
+  }
+
+  .warning {
+    margin: 3ex;
+    margin-right: 240px;
+    padding: 2ex;
+    border: 3px solid red;
+    max-width: 44em;
+  }
+
+  .buttons { 
+    margin-top: 4ex;
+    text-align: right;
+  }
+
+  .buttons button:first-child {
+    margin-right: 2em;
+  }
+
+  h2 { font-family: Village; }
+</style>
+<div class="photo">
+  <span class="header">EXPUNGED</span>
+  <span class="xxx" id="typing"></span>
+  <img src="[% C.uri_for('/jpeg/view', passholder.passholder_num) | html %]">
+</div>
+
+<div class="warning">
+  <h2>Are you sure&nbsp;?</h2>
+  <p>Are you sure you want to delete passholder Number [%
+  passholder.passholder_num %] ([% passholder.holder_name | html %])?
+  <em>There is <strong>no</strong> “undo”:</em> once you confirm below,
+  the data will be removed.</p>
+  <div class="buttons">
+    <form method="post">
+      <button type="button" id="cancel">Cancel</button>
+      <button type="submit" name="confirm" value="yes">Delete
+        Permanently</button>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+function setup_typing() {
+    var elem = $('#typing');
+    var count = 20;
+    var delay = 100;
+    var func = function() {
+      elem.append(document.createTextNode('X'));
+      if (--count > 0)
+        window.setTimeout(func, delay);
+    }
+    return func;
+}
+setup_typing()();
+
+$('#cancel').click(function() {
+  window.location.replace("[% cancel | url %]");
+});
+</script>
