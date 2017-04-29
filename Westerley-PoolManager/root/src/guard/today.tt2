@@ -22,7 +22,7 @@
     <td><a href="[%lookup_by_pass_no%]/[% rec.pass_num | html %]">[% rec.pass_num | html %]</a></td>
     <td>[% rec.holder_name | html %]</td>
     <td>[% rec.house_number | html %] [% rec.street_name | html %]</td>
-    <td class="numeric">[% rec.log_guests.defined ? rec.log.guests : '?' | html %]</td>
+    <td class="numeric">[% rec.log_guests.defined ? rec.log_guests : '?' | html %]</td>
   </tr>
 [%- END %]
 </table>
