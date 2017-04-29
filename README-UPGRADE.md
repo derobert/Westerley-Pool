@@ -14,3 +14,9 @@ SQL to upgrade your database is in `sql/upgrade-to-v0.8.sql`. In addition,
 you must run *outside of a transaction* `sql/upgrade-to-v0.8-p2.sql`.
 (This adds some more acceptable log types, but unfortunately PostgreSQL
 does not allow `ALTER TYPE ADD VALUE` inside a transaction).
+
+Upgrades from 0.8
+-----------------
+
+There are schema changes to support logging the number of guests on
+checkin. Please run `sql/upgrade-to-v0.9.sql` against your database.

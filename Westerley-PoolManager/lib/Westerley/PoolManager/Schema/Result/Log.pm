@@ -58,6 +58,11 @@ __PACKAGE__->table("log");
   extra: {custom_type_name => "log_entry_type",list => ["view","checkin","checkout","checkin_scanned","checkin_search"]}
   is_nullable: 0
 
+=head2 log_guests
+
+  data_type: 'smallint'
+  is_nullable: 1
+
 =head2 pass_num
 
   data_type: 'integer'
@@ -123,6 +128,8 @@ __PACKAGE__->add_columns(
     },
     is_nullable => 0,
   },
+  "log_guests",
+  { data_type => "smallint", is_nullable => 1 },
   "pass_num",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "holder_name",
@@ -180,8 +187,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-08-07 23:12:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:7MK3fyjcaBCtEu4UkLwEAg
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-04-29 12:07:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5ifnY1ZpCjfu68lYjJfpNQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

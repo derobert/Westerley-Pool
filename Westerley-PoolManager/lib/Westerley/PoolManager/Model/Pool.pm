@@ -25,10 +25,11 @@ sub search_issuable {
 }
 
 sub log_pass {
-	my ($self, $action, $pass) = @_;
+	my ($self, $action, $pass, $guests) = @_;
 
 	my %attr = (
 		log_type => $action,
+		log_guests => $guests,
 		pass_num => $pass->pass_num,
 	);
 

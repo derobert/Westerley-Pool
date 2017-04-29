@@ -55,6 +55,9 @@
       [% ELSIF !from_search %]
 <form method="post">
    <button name="op" value="checkin">Check In</button>
+   <input type="number" name="guests"
+          style="width: 5em" placeholder="Guests"
+          min="0" max="99" required>
 </form>
       [% END %]
     [% ELSE %]

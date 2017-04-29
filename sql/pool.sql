@@ -149,6 +149,7 @@ CREATE TABLE log (
 	log_num        SERIAL PRIMARY KEY,
 	log_time       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	log_type       LOG_ENTRY_TYPE NOT NULL,
+	log_guests     SMALLINT CHECK (log_guests >= 0),
 	pass_num       INTEGER NOT NULL REFERENCES passes ON DELETE NO ACTION,
 	holder_name    VARCHAR(100) NOT NULL DEFAULT 'N/A',
 	family_name    VARCHAR(30) NOT NULL DEFAULT 'N/A',

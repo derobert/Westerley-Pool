@@ -59,7 +59,8 @@ sub pass :Local :Args(1) {
 
 	my $op = $c->req->params->{op} // '';
 	if ('checkin' eq $op) {
-		$c->model('Pool')->log_pass(checkin_scanned => $row);
+		$c->model('Pool')->log_pass('checkin_scanned', $row,
+			                        $c->req->params->{guests});
 		$c->stash(checked_in => 1);
 	} else {
 		$c->model('Pool')->log_pass(view => $row);
@@ -78,6 +79,12 @@ sub checkin :Local :Args(0) :POST {
 		return;
 	}
 
+	my $guests = $c->req->params->{guests} // 'invalid';
+	unless ($guests =~ /^[0-9]+$/) {
+		$c->stash->{JSON} = { status => 0 };
+		return;
+	}
+
 	# FIXME: This winds up pulling the jpeg...
 	my $row = $c->model('Pool::Pass')->find($c->req->params->{pass_num}, {
 		prefetch => {
@@ -85,7 +92,7 @@ sub checkin :Local :Args(0) :POST {
 		},
 	});
 	if ($row) {
-		$c->model('Pool')->log_pass("checkin_$type" => $row);
+		$c->model('Pool')->log_pass("checkin_$type", $row, $guests);
 		$c->stash->{JSON} = { status => 1 };
 	} else {
 		$c->stash->{JSON} = { status => 0 };
