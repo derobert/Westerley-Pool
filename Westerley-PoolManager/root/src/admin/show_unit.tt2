@@ -26,3 +26,9 @@
 </form>
 
 <a href="[% C.uri_for('/admin') %]">Back to Admin</a>
+
+<script>
+$('button.delete-family').click(function() {
+  return confirm("Really delete the selected family? This will delete the information for all family members as well and can not be undone.")
+})
+</script>
