@@ -108,6 +108,8 @@ sub print : Path('/pass/print') Args(0) {
 
 sub show_unit :Path('/unit') Args(1) {
 	my ( $self, $c, $unit_num ) = @_;
+	my $unit = $c->model('Pool::Unit')->find($unit_num)
+		or die "No such unit";
 
 	if (my $op = $c->req->params->{op}) {
 		if ('add' eq $op) {
@@ -119,11 +121,16 @@ sub show_unit :Path('/unit') Args(1) {
 				->delete;
 		} elsif ('edit' eq $op) {
 			$c->res->redirect($c->uri_for_action('admin/edit_family', $c->req->params->{family_num}), 303);
+		} elsif ('allow' eq $op) {
+			$unit->update({unit_suspended => 0});
+		} elsif ('suspend' eq $op) {
+			$unit->update({unit_suspended => 1});
 		} else {
 			die "Uknown op";
 		}
 	}
 
+	$c->stash->{unit} = $unit;
 	$c->stash->{families} = $c->model('Pool::Family')
 		->search({unit_num => $unit_num}, {order_by => 'family_name'});
 }
