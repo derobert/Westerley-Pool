@@ -46,7 +46,7 @@ sub index :Path :Args(0) {
 	}
 
 	if ($c->req->params->{by_address}) {
-		my $unit = $c->model('Pool::Unit')->find({ house_number => $c->req->params->{house_number}, street_ref => $c->req->params->{street_ref}});
+		my $unit = $c->model('Pool::Unit')->find({ house_number => 0+$c->req->params->{house_number}, street_ref => $c->req->params->{street_ref}});
 		if ($unit) {
 			$c->res->redirect( $c->uri_for_action('admin/show_unit', $unit->unit_num), 303);
 			$c->detach;
