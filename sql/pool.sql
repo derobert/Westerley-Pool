@@ -142,7 +142,7 @@ CREATE TYPE log_entry_type AS ENUM (
 	'checkin',  -- guard pressed checkin button
 	'checkout', -- guard pressed checkout button (future)
 	'checkin_scanned', -- guard checked in after scanning pass
-	'checkin_search', -- guard checked in after searching by address (etc.)
+	'checkin_search'  -- guard checked in after searching by address (etc.)
 );
 
 CREATE TABLE log (
