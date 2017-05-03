@@ -32,9 +32,14 @@
 </style>
 <script type="text/javascript">
     function check_in(btn, pass_num) {
+        var ge = document.getElementById('guests_'+pass_num);
+        if (!ge.checkValidity()) {
+            alert("Please enter the number of guests.");
+            return false;
+        }
         jQuery.post(
             "[% C.uri_for('/guard/checkin') %]",
-            { "pass_num": pass_num, "checkin_type": "search" },
+            { "pass_num": pass_num, "guests": ge.value, "checkin_type": "search" },
             function(dat, stat, req) {
                 if (dat.status) {
                     $(btn).html('Checked in');
@@ -69,11 +74,14 @@
     [% p.passholder.age_group.age_group_name | html %]
   </span>
   <span class="checkin">
-    [% IF p.allow_admission %]
+    [%- IF p.allow_admission %]
     <button type="button" onclick="check_in(this, [% p.pass_num | html %])">Check In</button>
-    [% ELSE %]
+    <input type="number" id="guests_[% p.pass_num | html %]"
+           style="width: 3em" placeholder="Guests"
+           min="0" max="99" required>
+    [%- ELSE %]
     <span class="go-away">[% site.messages.no_admit_short %]</span>
-    [% END %]
+    [%- END %]
   </span>
 </div>
   [%-   END %]

@@ -1,4 +1,38 @@
-﻿<h1>Pick a Family</h1>
+﻿<style>
+  th         { text-align: right; }
+  th:after   { content: ":"; padding-right: 0.25em; }
+  td         { text-align: left; }
+  .suspended { background: red; padding: 3px; font-weight: bold; }
+</style>
+
+<h2>Unit Info</h2>
+<form method="post">
+  <table>
+    <tr>
+      <th>Number</th><td>[% unit.unit_num | html %]</td>
+    </tr>
+    <tr>
+      <th>Address</th>
+      <td>
+        [%- unit.house_number | html %] [% unit.street.street_name | html %]
+      </td>
+    </tr>
+    <tr>
+      <th>Status</th>
+      <td>
+        [%- IF unit.unit_suspended %]
+        <span class="suspended">Suspended</span>
+        <button type="submit" name="op" value="allow">End Suspension</button>
+        [%- ELSE %]
+        <span class="good-standing">OK</span>
+        <button type="submit" name="op" value="suspend">Suspend</button>
+        [%- END %]
+      </td>
+    </tr>
+  </table>
+</form>
+
+<h2>Pick a Family</h2>
 <form method="post">
   <ul class="family-list">
 [% FOREACH f = families.all %]
@@ -26,3 +60,9 @@
 </form>
 
 <a href="[% C.uri_for('/admin') %]">Back to Admin</a>
+
+<script>
+$('button.delete-family').click(function() {
+  return confirm("Really delete the selected family? This will delete the information for all family members as well and can not be undone.")
+})
+</script>

@@ -142,16 +142,42 @@ CREATE TYPE log_entry_type AS ENUM (
 	'checkin',  -- guard pressed checkin button
 	'checkout', -- guard pressed checkout button (future)
 	'checkin_scanned', -- guard checked in after scanning pass
-	'checkin_search', -- guard checked in after searching by address (etc.)
+	'checkin_search'  -- guard checked in after searching by address (etc.)
 );
 
 CREATE TABLE log (
 	log_num        SERIAL PRIMARY KEY,
 	log_time       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	log_type       LOG_ENTRY_TYPE NOT NULL,
+	log_guests     SMALLINT CHECK (log_guests >= 0),
 	pass_num       INTEGER NOT NULL REFERENCES passes ON DELETE NO ACTION,
 	holder_name    VARCHAR(100) NOT NULL DEFAULT 'N/A',
 	family_name    VARCHAR(30) NOT NULL DEFAULT 'N/A',
 	house_number   INTEGER NOT NULL DEFAULT -1,
 	street_name    VARCHAR(100) NOT NULL DEFAULT 'N/A'
+);
+
+CREATE TABLE documents (
+	document_num       SERIAL                   NOT NULL PRIMARY KEY,
+	document_name      VARCHAR(100)             NOT NULL UNIQUE,
+	passholder_min_age INTERVAL YEAR TO MONTH   NOT NULL,
+	passholder_max_age INTERVAL YEAR TO MONTH   NOT NULL,
+	CHECK(passholder_min_age < passholder_max_age)
+);
+
+CREATE TABLE document_versions (
+	document_num   INTEGER  NOT NULL REFERENCES documents ON DELETE CASCADE,
+	version_date   DATE     NOT NULL,
+	PRIMARY KEY(document_num, version_date)
+);
+
+CREATE TABLE passholder_documents (
+	passholder_num INTEGER NOT NULL REFERENCES passholders ON DELETE CASCADE,
+	document_num   INTEGER NOT NULL REFERENCES documents ON DELETE CASCADE,
+	most_recent    DATE NOT NULL,
+	PRIMARY KEY(passholder_num, document_num),
+	CONSTRAINT ph_docs_version_exists
+	  FOREIGN KEY (document_num, most_recent)
+	  REFERENCES document_versions(document_num, version_date)
+	  ON DELETE CASCADE;
 );

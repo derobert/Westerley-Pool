@@ -1,7 +1,8 @@
-﻿[% PROCESS 'guard/inc_wand.tt2' -%]
-[% IF pass %]
-  [% IF pass.passholder %]
-<span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
+﻿[%- PROCESS 'guard/inc_wand.tt2' %]
+[%- USE date %]
+[%- IF pass %]
+  [%- IF pass.passholder %]
+<span class="member-image" style="float: left; margin: 1ex; margin-left: 0"><img src="[% photo_uri | html %]"></span>
 
 <table>
 <tr>
@@ -54,7 +55,17 @@
         <strong>Checked in.</strong>
       [% ELSIF !from_search %]
 <form method="post">
+    [%- needed = pass.passholder.needed_documents %]
+    [%- IF needed %]
+    <h2>Unseen Documents</h2>
+    <p>Please present the below documents to the member (and ask the
+    member to sign them, if applicable) before admitting the member.</p>
+    [% PROCESS 'common/needed-docs.tt2' needed_docs=needed %]
+    [%- END %]
    <button name="op" value="checkin">Check In</button>
+   <input type="number" name="guests"
+          style="width: 5em" placeholder="Guests"
+          min="0" max="99" required>
 </form>
       [% END %]
     [% ELSE %]

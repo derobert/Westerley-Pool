@@ -2,8 +2,10 @@
 <style type="text/css">
   table { border-collapse: collapse; }
   td, th { padding-left: 1.5em; padding-top: .25em; padding-bottom: .25em; }
+  td:last-child, th:last-child { padding-right: 1.5em }
   tr:nth-child(even) { background: rgb(255,255,220); }
   tr:nth-child(odd) { background: rgb(220,220,255); }
+  .numeric { text-align: right }
 </style>
 <h1>Checked in Today</h1>
 <table>
@@ -12,6 +14,7 @@
     <th>Pass #</th>
     <th>Name</th>
     <th>Address</th>
+    <th class="numeric"># Guests</th>
   </tr>
 [%- FOR rec IN checkin %]
   <tr>
@@ -19,6 +22,7 @@
     <td><a href="[%lookup_by_pass_no%]/[% rec.pass_num | html %]">[% rec.pass_num | html %]</a></td>
     <td>[% rec.holder_name | html %]</td>
     <td>[% rec.house_number | html %] [% rec.street_name | html %]</td>
+    <td class="numeric">[% rec.log_guests.defined ? rec.log_guests : '?' | html %]</td>
   </tr>
 [%- END %]
 </table>

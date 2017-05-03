@@ -87,5 +87,13 @@ INSERT INTO passes (passholder_num, pass_num, pass_issued, pass_valid) VALUES
 	), (
 		NULL, 778420100, '1980-01-02 12:00:00-0500', FALSE
 	);
+
+INSERT INTO documents (document_name, passholder_min_age, passholder_max_age) VALUES
+	( 'Pool Rules', '16-0', '9999-11' );
+INSERT INTO document_versions (document_num, version_date) VALUES
+	(
+		(SELECT document_num FROM documents WHERE document_name = 'Pool Rules'),
+		'2017-05-01'
+	);
 	
 \i photo-unvars.sql

@@ -56,16 +56,16 @@ __PACKAGE__->table("passes");
   is_nullable: 0
   original: {default_value => \"now()"}
 
+=head2 pass_printed
+
+  data_type: 'timestamp with time zone'
+  is_nullable: 1
+
 =head2 pass_valid
 
   data_type: 'boolean'
   default_value: true
   is_nullable: 0
-
-=head2 pass_printed
-
-  data_type: 'timestamp with time zone'
-  is_nullable: 1
 
 =cut
 
@@ -81,10 +81,10 @@ __PACKAGE__->add_columns(
     is_nullable   => 0,
     original      => { default_value => \"now()" },
   },
-  "pass_valid",
-  { data_type => "boolean", default_value => \"true", is_nullable => 0 },
   "pass_printed",
   { data_type => "timestamp with time zone", is_nullable => 1 },
+  "pass_valid",
+  { data_type => "boolean", default_value => \"true", is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -137,8 +137,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07042 @ 2015-07-29 04:53:27
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cZ/WtFAYxrLoaEM/WBX97g
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-04-30 16:54:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:CCt24sKpj/zPgC4nSLBilQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
