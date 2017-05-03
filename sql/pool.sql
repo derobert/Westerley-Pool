@@ -179,5 +179,5 @@ CREATE TABLE passholder_documents (
 	CONSTRAINT ph_docs_version_exists
 	  FOREIGN KEY (document_num, most_recent)
 	  REFERENCES document_versions(document_num, version_date)
-	  ON DELETE CASCADE;
+	  ON DELETE CASCADE
 );
