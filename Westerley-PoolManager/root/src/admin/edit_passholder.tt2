@@ -102,11 +102,18 @@
     position: absolute;
   }
 </style>
-[%
+[%-
   MACRO fval(fname) IF C.req.params.$fname.defined;
      GET C.req.params.$fname;
    ELSE;
      GET passholder.$fname;
+   END
+%]
+[%-
+  MACRO fval_date(fname) IF C.req.params.$fname.defined;
+     GET C.req.params.$fname;
+   ELSE;
+     GET passholder.$fname.strftime('%Y-%m-%d');
    END
 %]
 <form method="post">
@@ -142,7 +149,7 @@
     <th>Date of Birth:</th>
     <td>
       <input type="text" class="passholder-dob" maxlength="10"
-       name="holder_dob" value="[% fval('holder_dob') | html %]">
+       name="holder_dob" value="[% fval_date('holder_dob') | html %]">
       <span class="format">YYYY-MM-DD</span>
       <span class="note">
         Children only. For an adult, enter 1900-01-01.
