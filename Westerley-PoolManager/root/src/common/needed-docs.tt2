@@ -1,0 +1,55 @@
+﻿<style>
+  .docs {
+    margin: 1ex;
+    margin-bottom: 4ex;
+    border-collapse: collapse;
+  }
+  .docs, .docs caption {
+    border: 2px solid rgb(200,200,255);
+    background: rgb(245,245,255);
+  }
+  .docs th, .docs td {
+    border: 1px solid rgb(180, 180, 255);
+    padding-left: .5ex;
+    padding-right: .5ex;
+    text-align: left;
+  }
+  .docs caption {
+    font-weight: bold;
+    border-bottom: none;
+    text-transform: capitalize;
+    text-shadow: 0px 0px 3px rgb(200,200,255);
+    font-size: 110%;
+    padding-top: .33ex;
+    padding-bottom: .33ex;
+  }
+  .docs td label:first-child { padding-right: .5ex; }
+</style>
+    <table class="docs">
+      <caption>Documents member has not seen</caption>
+      <thead>
+        <tr>
+          <th class="title">Title</th>
+          <th class="current">Current Version</th>
+          <th class="seen">Seen Version</th>
+          <th class="presented">Presented</th>
+        </tr>
+      </thead>
+      <tbody>
+        [%- FOREACH doc IN needed_docs %]
+        <tr>
+          <td class="title">[% doc.document_name | html%]</td>
+          <td class="current">[% doc.doc_most_recent.strftime('%Y-%m-%d') | html %]</td>
+          <td class="seen">[% doc.passholder_most_recent.defined ? doc.passholder_most_recent.strftime('%Y-%m-%d') : 'N/A' %]</td>
+          <td class="presented">
+            <label><input type="radio"
+             name="presented![%doc.document_num%]![%doc.doc_most_recent%]"
+             value="1">Yes</label>
+            <label><input type="radio"
+             name="presented![%doc.document_num%]![%doc.doc_most_recent%]"
+             value="0" checked>No</label>
+           </td>
+        </tr>
+        [%- END %]
+      </tbody>
+    </table>

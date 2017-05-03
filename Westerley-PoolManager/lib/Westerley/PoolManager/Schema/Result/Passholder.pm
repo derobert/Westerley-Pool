@@ -173,9 +173,24 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 passholder_documents
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-05-13 20:30:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1DOfqIb6VEmk7cDIXJ5lbg
+Type: has_many
+
+Related object: L<Westerley::PoolManager::Schema::Result::PassholderDocument>
+
+=cut
+
+__PACKAGE__->has_many(
+  "passholder_documents",
+  "Westerley::PoolManager::Schema::Result::PassholderDocument",
+  { "foreign.passholder_num" => "self.passholder_num" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-04-30 16:54:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KnFQc7sONDYpaUiZ1hqehA
 
 __PACKAGE__->column_info('holder_notes')->{remove_column} = 0;
 

@@ -280,9 +280,15 @@ sub edit_passholder : Path('/passholder') Args(2) {
 					$c->log->debug("Issued pass #@{[$pass->pass_num]} to passholder #@{[$passholder->passholder_num]}.");
 				}
 			}
-
-			$c->res->redirect($c->uri_for_action('admin/edit_family',
-					$passholder->family_num), 303);
+			
+			my $docs_needed = $passholder->needed_documents->count;
+			if ($docs_needed) {
+				$c->res->redirect($c->uri_for_action('admin/present_passholder_documents',
+						$passholder->passholder_num), 303);
+			} else {
+				$c->res->redirect($c->uri_for_action('admin/edit_family',
+						$passholder->family_num), 303);
+			}
 			$c->detach;
 		} elsif ('delete' eq $op) {
 			$c->res->redirect($c->uri_for_action('admin/delete_passholder',
@@ -294,6 +300,27 @@ sub edit_passholder : Path('/passholder') Args(2) {
 	}
 
 	$c->stash->{passholder} = $passholder;
+}
+
+sub present_passholder_documents : Path('/documents/present') Args(1) {
+	my ($self, $c, $passholder_num) = @_;
+	my $passholder = $c->model('Pool::Passholder')->find($passholder_num);
+
+	$c->stash->{passholder} = $passholder;
+
+	my $op = $c->req->params->{op} // '';
+	if ('done' eq $op) {
+		foreach my $param (grep(/^presented!/, keys %{$c->req->params})) {
+			next unless $c->req->params->{$param}; # only if set to yes
+			$param =~ /^presented!([0-9]+)!([0-9-]+T[0-9:]+)$/
+				or die "Unparsable 'presented' param: $param";
+			$passholder->presented_document($1, $2);
+			$c->log->info("Presented document #$1 version $2 to passholder #@{[$passholder->passholder_num]}");
+		}
+		$c->res->redirect($c->uri_for_action('admin/edit_family',
+				$passholder->family_num), 303);
+		$c->detach;
+	}
 }
 
 sub delete_passholder : Path('/delete_passholder') Args(1) {

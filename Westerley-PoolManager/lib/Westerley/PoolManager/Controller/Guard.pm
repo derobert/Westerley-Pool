@@ -59,6 +59,13 @@ sub pass :Local :Args(1) {
 
 	my $op = $c->req->params->{op} // '';
 	if ('checkin' eq $op) {
+		foreach my $param (grep(/^presented!/, keys %{$c->req->params})) {
+			next unless $c->req->params->{$param}; # only if set to yes
+			$param =~ /^presented!([0-9]+)!([0-9-]+T[0-9:]+)$/
+				or die "Unparsable 'presented' param: $param";
+			$row->passholder->presented_document($1, $2);
+			$c->log->info("Presented document #$1 version $2 to passholder #@{[$row->passholder->passholder_num]}");
+		}
 		$c->model('Pool')->log_pass('checkin_scanned', $row,
 			                        $c->req->params->{guests});
 		$c->stash(checked_in => 1);
