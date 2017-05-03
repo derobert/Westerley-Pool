@@ -1,7 +1,35 @@
-﻿[% PROCESS 'guard/inc_wand.tt2' -%]
-[% IF pass %]
-  [% IF pass.passholder %]
-<span class="member-image" style="float: left"><img src="[% photo_uri | html %]"></span>
+﻿[%- PROCESS 'guard/inc_wand.tt2' %]
+[%- USE date %]
+[%- IF pass %]
+  [%- IF pass.passholder %]
+<style>
+  .docs {
+    margin: 1ex;
+    margin-bottom: 4ex;
+    border-collapse: collapse;
+  }
+  .docs, .docs caption {
+    border: 2px solid rgb(200,200,255);
+    background: rgb(245,245,255);
+  }
+  .docs th, .docs td {
+    border: 1px solid rgb(180, 180, 255);
+    padding-left: .5ex;
+    padding-right: .5ex;
+    text-align: left;
+  }
+  .docs caption {
+    font-weight: bold;
+    border-bottom: none;
+    text-transform: capitalize;
+    text-shadow: 0px 0px 3px rgb(200,200,255);
+    font-size: 110%;
+    padding-top: .33ex;
+    padding-bottom: .33ex;
+  }
+  td label:first-child { padding-right: .5ex; }
+</style>
+<span class="member-image" style="float: left; margin: 1ex; margin-left: 0"><img src="[% photo_uri | html %]"></span>
 
 <table>
 <tr>
@@ -54,6 +82,40 @@
         <strong>Checked in.</strong>
       [% ELSIF !from_search %]
 <form method="post">
+    [%- needed = pass.passholder.needed_documents %]
+    [%- IF needed %]
+    <h2>Unseen Documents</h2>
+    <p>Please present the below documents to the member (and ask the
+    member to sign them, if applicable) before admitting the member.</p>
+    <table class="docs">
+      <caption>Documents member has not seen</caption>
+      <thead>
+        <tr>
+          <th class="title">Title</th>
+          <th class="current">Current Version</th>
+          <th class="seen">Seen Version</th>
+          <th class="presented">Presented</th>
+        </tr>
+      </thead>
+      <tbody>
+        [%- FOREACH doc IN needed %]
+        <tr>
+          <td class="title">[% doc.document_name | html%]</td>
+          <td class="current">[% doc.doc_most_recent.strftime('%Y-%m-%d') | html %]</td>
+          <td class="seen">[% doc.passholder_most_recent.defined ? doc.passholder_most_recent.strftime('%Y-%m-%d') : 'N/A' %]</td>
+          <td class="presented">
+            <label><input type="radio"
+             name="presented![%doc.document_num%]![%doc.doc_most_recent%]"
+             value="1">Yes</label>
+            <label><input type="radio"
+             name="presented![%doc.document_num%]![%doc.doc_most_recent%]"
+             value="0" checked>No</label>
+           </td>
+        </tr>
+        [%- END %]
+      </tbody>
+    </table>
+    [%- END %]
    <button name="op" value="checkin">Check In</button>
    <input type="number" name="guests"
           style="width: 5em" placeholder="Guests"
