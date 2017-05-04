@@ -1,0 +1,17 @@
+﻿[% META title = 'Add Document Version' %]
+<form method="post">
+  Current versions:
+  <ul>
+[%- FOREACH dv = document_versions %]
+    <li>[% dv.version_date.strftime('%Y-%m-%d') | html %]</li>
+[%- END %]
+  </ul>
+
+  <label>New version to add: <input type="text" name="version"></label>
+  <button type="submit" name="op" value="add">Add Version</button>
+</form>
+<p class="footnote-ish">
+ Note: Changing or deleting an existing version would make a mess of
+ which passholders have seen which version, so there isn't an easy way
+ to do it. If you must, it can be done via the SQL prompt.
+</p>
