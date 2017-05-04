@@ -25,3 +25,6 @@ CREATE TABLE passholder_documents (
 	  REFERENCES document_versions(document_num, version_date)
 	  ON DELETE CASCADE
 );
+
+INSERT INTO roles(role_name, role_descr)
+	VALUES ( 'documents', 'Manage documents and versions' );

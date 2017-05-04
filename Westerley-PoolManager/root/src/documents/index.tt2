@@ -1,0 +1,49 @@
+﻿[% META title = 'Document Management' %]
+
+<table class="documents simple-table" style="margin-top: 2ex;
+margin-bottom: 2ex;">
+  <thead>
+    <tr>
+      <th rowspan="2" class="name">Name</th>
+      <th colspan="2" class="age-range">Passholder Age Range</th>
+      <th rowspan="2" class="versions">Versions</th>
+    </tr>
+    <tr>
+      <th class="min-age">≥</th>
+      <th class="max-age">&lt;</th>
+    </tr>
+  </thead>
+  <tbody>
+[%- FOREACH doc = docs.all %]
+    <tr>
+      <td class="name">
+        <a href="/document/[% doc.document_num %]/edit">
+          [%- doc.document_name | html %]</a>
+      </td>
+      <td class="min-age">[% doc.passholder_min_age | html %]</td>
+      <td class="max-age">[% doc.passholder_max_age | html %]</td>
+      <td class="versions">
+        <a href="/document/[% doc.document_num %]/versions">
+  [%- USE dv_iter = iterator(doc.document_versions) -%]
+  [%- FOREACH vers = dv_iter %]
+          <span class="version">[% vers.version_date.strftime('%Y-%m-%d') | html %]</span>
+  [%- END %]
+  [%- UNLESS dv_iter.size() %]
+          <span class="noversion">(none)</span>
+  [%- END %]
+        </a>
+      </td>
+    </tr>
+[%- END %]
+  <tfoot>
+    <td class="name" colspan="4">
+      <a href="/document/new/edit">Add New…</a>
+    </td>
+  </tfoot>
+</table>
+
+<p class="footnote-ish">
+  Note: If you need to delete a document, you'll have to do so via the
+  SQL prompt. Deleting a document potentially destroys a lot of data and
+  should hardly ever be needed.
+</p>

@@ -13,7 +13,7 @@
    # define a data structure to hold sitewide data
    site = {
      title     => 'Westerley Pool Manager',
-     copyright => '2014 Anthony DeRobertis',
+     copyright => '2014–2017 Anthony DeRobertis',
      bugurl    => 'https://github.com/derobert/Westerley-Pool/issues',
    };
 

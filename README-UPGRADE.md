@@ -19,4 +19,10 @@ Upgrades from 0.8
 -----------------
 
 There are schema changes to support logging the number of guests on
-checkin. Please run `sql/upgrade-to-v0.9.sql` against your database.
+checkin and storing which documents each passholder has been presented.
+Please run `sql/upgrade-to-v0.9.sql` against your database.
+
+There is a new role, documents, to manage documents & their versions.
+The upgrade SQL adds it to the database, but you'll have to add your
+users to it by hand. The sample-admin.sql file has been updated if you
+need an example.
