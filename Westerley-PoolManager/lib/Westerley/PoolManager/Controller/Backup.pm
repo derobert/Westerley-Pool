@@ -219,7 +219,9 @@ sub op_backup : Private {
 				$c->log->debug("Performing pg_dump.");
 				run3 [qw(pg_dump -Fc), '-Z', $zlevel, $self->db_name], \undef, $fh,
 					undef;
+				$c->stash(exit_code => $?);
 				$c->stash(size => -s $fullname);
+				$? and die "pg_dump returned exit code $?";
 			});
 	};
 	if ($@) {
