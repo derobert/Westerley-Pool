@@ -74,18 +74,32 @@
     width: 100px;
     height: 100px;
     object-fit: contain;
-    oject-position: bottom;
+    object-position: bottom;
   }
   .passholder-card .name {
     display: block
   }
   .passholder-card {
+    position: relative;
     padding: 0.25em;
     margin: .5em;
   }
   .passholder-add {
     margin: .5em;
     display: block;
+  }
+  .passholder-card .suspended {
+    display: block;
+    position: absolute;
+    font-weight: bold;
+    top: 0.5ex;
+    width: 100%;
+    background: rgba(255, 128, 0, 0.75);
+    border: none;
+    border-radius: 0.5ex;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin: 0;
   }
 </style>
 
@@ -97,6 +111,9 @@
     <img class="photo"
      src="[% C.uri_for('/jpeg/view', p.passholder_num) | html %]">
     <span class="name">[% p.holder_name | html %]</span>
+  [%- IF p.holder_suspended %]
+    <span class="suspended">Suspended</span>
+  [%- END %]
   </button>
 [% END %]
   <button name="op" class="passholder-add" value="p:add">
