@@ -294,6 +294,14 @@ sub edit_passholder : Path('/passholder') Args(2) {
 			$c->res->redirect($c->uri_for_action('admin/delete_passholder',
 					$passholder_num), 303);
 			$c->detach;
+		} elsif ('suspend' eq $op) {
+			$passholder->update({holder_suspended => 1});
+			$c->res->redirect($c->uri_for_action('admin/edit_family',
+					$passholder->family_num), 303);
+		} elsif ('unsuspend' eq $op) {
+			$passholder->update({holder_suspended => 0});
+			$c->res->redirect($c->uri_for_action('admin/edit_family',
+					$passholder->family_num), 303);
 		} else {
 			die "Uknown up";
 		}

@@ -65,7 +65,14 @@
   }
 
   .delbutton {
-    background: rgb(255,200,200);
+    background: rgb(255,180,180);
+    margin-top: 2ex;
+    font-size: 90%;
+  }
+
+  .suspension-button {
+    background: rgb(220,220,220);
+    margin-left: 1em;
     margin-top: 2ex;
     font-size: 90%;
   }
@@ -218,6 +225,13 @@
 [%- IF passholder.passholder_num %]
 <button type="submit" name="op" value="delete"
         class="delbutton">Delete...</button>
+  [%- IF passholder.holder_suspended %]
+<button type="submit" name="op" value="unsuspend"
+        class="suspension-button">End Suspension</button>
+  [% ELSE %]
+<button type="submit" name="op" value="suspend"
+        class="suspension-button">Suspend</button>
+  [%- END %]
 [%- END %]
 <button type="submit" name="op" value="save"
         class="savebutton">Save</button>
