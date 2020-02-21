@@ -351,9 +351,9 @@ sub process {
 
 sub _plot_cut_marks {
 	my ($self, $cr, $side) = @_;
-	$cr->save;
 	$side eq 'front' || $self->cut_marks_back or return;
 	$self->cut_marks or return;
+	$cr->save;
 
 	# do not draw lines inside the pass area, as they'd wind up on the
 	# passes.
