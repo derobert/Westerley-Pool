@@ -1,3 +1,7 @@
 <!-- BEGIN site/header -->
-<h1 class="title"><a href="[%C.uri_for('/')%]">[% template.title or site.title %]</a></h1>
+<h1 class="title"><a href="[%C.uri_for('/')%]">[% site.title %]</a>
+[%- IF template.title != '' -%]
+: [% template.title %]
+[%- END -%]
+</h1>
 <!-- END site/header -->

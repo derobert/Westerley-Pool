@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <title>[% template.title or site.title %]</title>
+  <title>
+[%- IF '' != template.title -%]
+[% template.title %] —
+[%- END %] [% site.title %]
+  </title>
   <style type="text/css">
 [% PROCESS ttsite.css %]
   </style>

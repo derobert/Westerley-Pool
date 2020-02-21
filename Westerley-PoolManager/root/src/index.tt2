@@ -20,6 +20,9 @@
   [%- IF C.check_user_roles('backup') %]
   <li><a href="[% C.uri_for('/backup') %]">Backup/Export Interface</a></li>
   [%- END %]
+  [%- IF C.check_user_roles('documents') %]
+  <li><a href="[% C.uri_for('/documents') %]">Document Management</a></li>
+  [%- END %]
   <li><a href="[% C.uri_for('/user/passwd') %]">Change Password</a></li>
   <li><a href="[% C.uri_for('/user/logout') %]">Log out</a></li>
 [%- ELSE %]

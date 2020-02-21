@@ -1,0 +1,18 @@
+﻿[% META title = 'Edit Document Attributes' %]
+<style>
+  label {
+    display: block;
+    margin-top: 1ex;
+    margin-bottom: 1ex;
+  }
+  input[name=name] { width: 30em }
+</style>
+<form method="post">
+<label>Name: <input type="text" maxlength="100" name="name"
+                    value="[% document.document_name | html %]"></label>
+<label>Min. Age: <input type="text" maxlength="100" name="min_age"
+                        value="[% document.passholder_min_age | html %]"></label>
+<label>Max. Age: <input type="text" maxlength="100" name="max_age"
+                        value="[% document.passholder_max_age | html %]"></label>
+<button type="submit" name="op" value="save">Save</button>
+</form>
